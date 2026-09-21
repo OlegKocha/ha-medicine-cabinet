@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Аптечка — проверка</title>
+<style>html,body{margin:0;height:100%;font-family:system-ui}body.dark{--primary-background-color:#111c24;--card-background-color:#1c2a34;--primary-text-color:#e5edf2;--secondary-text-color:#a5bac7;--divider-color:#354754;--secondary-background-color:#243744;--primary-color:#58c4c5;--text-primary-color:#14262a}</style>
+<medicine-cabinet-panel></medicine-cabinet-panel>
+<script type="module">
+import '/medicine_cabinet/frontend/medicine-cabinet.js?v=1.0.0';
+const {token} = window.DEV_ACCESS;
+let counter=0; const pending=new Map(); const subscribers=new Map();
+const socket=new WebSocket(`${location.protocol==='https:'?'wss':'ws'}://${location.host}/api/websocket`);
+const ready=new Promise((resolve,reject)=>{
+ socket.onmessage=event=>{
+  const message=JSON.parse(event.data);
+  if(message.type==='auth_required')socket.send(JSON.stringify({type:'auth',access_token:token}));
+  else if(message.type==='auth_ok')resolve();
+  else if(message.type==='auth_invalid')reject(new Error(message.message));
+  else if(message.type==='result'){
+   const task=pending.get(message.id);if(task){pending.delete(message.id);message.success?task.resolve(message.result):task.reject(message.error);}
+  }else if(message.type==='event')subscribers.get(message.id)?.(message.event);
+ };
+});
+async function callWS(message){await ready;return new Promise((resolve,reject)=>{const id=++counter;pending.set(id,{resolve,reject});socket.send(JSON.stringify({id,...message}));});}
+const user=await callWS({type:'auth/current_user'});
+const hass={language:'ru',user,callWS,fetchWithAuth:(path,init={})=>fetch(path,{...init,headers:{...init.headers,Authorization:`Bearer ${token}`}}),connection:{subscribeMessage:async(callback,message)=>{await ready;const id=++counter;subscribers.set(id,callback);await new Promise((resolve,reject)=>{pending.set(id,{resolve,reject});socket.send(JSON.stringify({id,...message}));});return ()=>{subscribers.delete(id);void callWS({type:'unsubscribe_events',subscription:id});};}}};
+window.testHass=hass;document.querySelector('medicine-cabinet-panel').hass=hass;
+</script></html>

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "strict": true,
+    "outDir": "custom_components/medicine_cabinet/frontend",
+    "rootDir": "frontend",
+    "noEmitOnError": true,
+    "skipLibCheck": true
+  },
+  "include": ["frontend/**/*.ts"]
+}

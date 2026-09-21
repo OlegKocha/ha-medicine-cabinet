@@ -1,0 +1,53 @@
+{
+  "title": "HAMB — Home Assistant Medicine Box",
+  "config": {
+    "step": {
+      "user": {
+        "title": "HAMB · Language",
+        "description": "Choose the language of the medicine inventory, reminders, and exports.",
+        "data": {
+          "language": "Language"
+        }
+      },
+      "name": {
+        "title": "Sidebar title",
+        "description": "Keep the default title or enter your own.",
+        "data": {
+          "sidebar_title": "Title"
+        }
+      }
+    },
+    "error": {
+      "invalid_title": "Enter a title between 1 and 100 characters.",
+      "invalid_language": "Choose RUS or EN."
+    },
+    "abort": {
+      "already_configured": "HAMB is already configured. Change the language and title in the integration options."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "HAMB · Language",
+        "description": "Choose the language of the medicine inventory, reminders, and exports.",
+        "data": {
+          "language": "Language"
+        }
+      },
+      "settings": {
+        "title": "Title and reminders",
+        "description": "Each package has reminders at 90 and 7 days. Mobile notifications require a registered Companion App device. Local Push availability depends on your app and connection settings.",
+        "data": {
+          "notification_time": "Daily check time (Home Assistant time zone)",
+          "persistent_notifications": "Show notifications inside Home Assistant",
+          "notify_targets": "Companion App devices",
+          "sidebar_title": "Sidebar title"
+        }
+      }
+    },
+    "error": {
+      "invalid_title": "Enter a title between 1 and 100 characters.",
+      "invalid_language": "Choose RUS or EN."
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "ha-medicine-cabinet",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "check": "tsc --noEmit",
+    "test:ui": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.55.1",
+    "typescript": "5.9.2"
+  }
+}

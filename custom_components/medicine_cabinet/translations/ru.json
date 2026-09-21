@@ -1,0 +1,53 @@
+{
+  "title": "HAMB — Home Assistant Medicine Box",
+  "config": {
+    "step": {
+      "user": {
+        "title": "HAMB · Язык",
+        "description": "Выберите язык интерфейса аптечки, уведомлений и экспорта.",
+        "data": {
+          "language": "Язык"
+        }
+      },
+      "name": {
+        "title": "Название в боковом меню",
+        "description": "Можно оставить название по умолчанию или ввести своё.",
+        "data": {
+          "sidebar_title": "Название"
+        }
+      }
+    },
+    "error": {
+      "invalid_title": "Введите название от 1 до 100 символов.",
+      "invalid_language": "Выберите RUS или EN."
+    },
+    "abort": {
+      "already_configured": "HAMB уже настроен. Язык и название можно изменить через настройки интеграции."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "HAMB · Язык",
+        "description": "Выберите язык интерфейса аптечки, уведомлений и экспорта.",
+        "data": {
+          "language": "Язык"
+        }
+      },
+      "settings": {
+        "title": "Название и уведомления",
+        "description": "По каждой упаковке отправляются напоминания за 90 и за 7 дней. Выберите устройства с HA Companion App. Доставка без интернета зависит от настроек Local Push и связи с сервером.",
+        "data": {
+          "notification_time": "Время ежедневной проверки (часовой пояс HA)",
+          "persistent_notifications": "Показывать уведомления внутри Home Assistant",
+          "notify_targets": "Устройства пользователей с HA Companion App",
+          "sidebar_title": "Название в боковом меню"
+        }
+      }
+    },
+    "error": {
+      "invalid_title": "Введите название от 1 до 100 символов.",
+      "invalid_language": "Выберите RUS или EN."
+    }
+  }
+}

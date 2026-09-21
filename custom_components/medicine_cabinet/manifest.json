@@ -1,0 +1,24 @@
+{
+  "domain": "medicine_cabinet",
+  "name": "HAMB — Home Assistant Medicine Box",
+  "codeowners": [
+    "@OlegKocha"
+  ],
+  "config_flow": true,
+  "dependencies": [
+    "frontend",
+    "http",
+    "panel_custom",
+    "persistent_notification",
+    "websocket_api"
+  ],
+  "documentation": "https://github.com/OlegKocha/ha-medicine-cabinet",
+  "integration_type": "service",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/OlegKocha/ha-medicine-cabinet/issues",
+  "requirements": [
+    "reportlab==4.4.3"
+  ],
+  "single_config_entry": true,
+  "version": "1.0.0"
+}

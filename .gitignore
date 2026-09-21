@@ -1,0 +1,16 @@
+.venv/
+.tools/
+node_modules/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+tmp/
+.DS_Store
+.env
+test-results/
+playwright-report/
+.ha-test/
