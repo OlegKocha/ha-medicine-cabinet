@@ -33,7 +33,7 @@
 1. Copy this repository's URL.
 2. In HACS, open **⋮ → Custom repositories**.
 3. Paste the URL and select **Integration** as the type.
-4. Find **HAMB — Home Assistant Medicine Box** and download the integration.
+4. Search for **HAMB**, then open **HAMB — Home Assistant Medicine Box** and download the integration.
 5. Restart Home Assistant, then follow the initial setup steps below.
 
 Learn more: [adding a custom repository to HACS](https://www.hacs.xyz/docs/faq/custom_repositories/).

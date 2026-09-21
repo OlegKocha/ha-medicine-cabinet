@@ -3,7 +3,7 @@
 <style>html,body{margin:0;height:100%;font-family:system-ui}body.dark{--primary-background-color:#111c24;--card-background-color:#1c2a34;--primary-text-color:#e5edf2;--secondary-text-color:#a5bac7;--divider-color:#354754;--secondary-background-color:#243744;--primary-color:#58c4c5;--text-primary-color:#14262a}</style>
 <medicine-cabinet-panel></medicine-cabinet-panel>
 <script type="module">
-import '/medicine_cabinet/frontend/medicine-cabinet.js?v=1.0.0';
+import '/medicine_cabinet/frontend/medicine-cabinet.js?v=1.1.0';
 const {token} = window.DEV_ACCESS;
 let counter=0; const pending=new Map(); const subscribers=new Map();
 const socket=new WebSocket(`${location.protocol==='https:'?'wss':'ws'}://${location.host}/api/websocket`);

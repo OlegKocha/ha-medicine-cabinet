@@ -33,7 +33,7 @@
 1. Скопируйте адрес этого репозитория.
 2. В HACS откройте **⋮ → Пользовательские репозитории / Custom repositories**.
 3. Вставьте адрес и выберите тип **Integration**.
-4. Найдите **HAMB — Home Assistant Medicine Box** и скачайте интеграцию.
+4. Введите **HAMB** в поиске, откройте **HAMB — Home Assistant Medicine Box** и скачайте интеграцию.
 5. Перезапустите Home Assistant и перейдите к первоначальной настройке ниже.
 
 Подробнее: [добавление пользовательского репозитория в HACS](https://www.hacs.xyz/docs/faq/custom_repositories/).
