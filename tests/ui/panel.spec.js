@@ -12,7 +12,7 @@ test.beforeEach(async({page})=>{
  await page.goto('/test-panel');
  await expect(page.locator('#kit')).toBeVisible();
  await page.waitForFunction(()=>window.testHass);
- await expect(page.locator('header button')).toHaveCount(0);
+ await expect(page.locator('header button:visible')).toHaveCount(page.viewportSize().width <= 870 ? 1 : 0);
 });
 
 test('real inventory: cabinet, photo-free item, duplicate spoiler, edit, search and PDF',async({page},testInfo)=>{

@@ -8,7 +8,7 @@ export default defineConfig({
   projects: [
     {name:'desktop',use:{viewport:{width:1280,height:900}}},
     {name:'mobile',use:{viewport:{width:390,height:844},isMobile:true,hasTouch:true}},
-    {name:'webkit-desktop',testMatch:['**/picker.spec.js','**/medicine.spec.js','**/categories.spec.js'],use:{browserName:'webkit',viewport:{width:1280,height:900}}},
-    {name:'webkit-mobile',testMatch:['**/picker.spec.js','**/medicine.spec.js','**/categories.spec.js'],use:{browserName:'webkit',viewport:{width:390,height:844},isMobile:true,hasTouch:true}},
+    {name:'webkit-desktop',testMatch:['**/picker.spec.js','**/medicine.spec.js','**/categories.spec.js','**/navigation.spec.js'],use:{browserName:'webkit',viewport:{width:1280,height:900}}},
+    {name:'webkit-mobile',testMatch:['**/picker.spec.js','**/medicine.spec.js','**/categories.spec.js','**/navigation.spec.js'],use:{browserName:'webkit',viewport:{width:390,height:844},isMobile:true,hasTouch:true}},
   ],
 });
