@@ -1,6 +1,42 @@
 "use strict";
 /** Local translations. User-entered names and notes are never translated. */
 const english = {
+    "Количество упаковок": "Number of packages",
+    "Уменьшить количество": "Decrease quantity",
+    "Увеличить количество": "Increase quantity",
+    "От 1 до 100. Дата, фото и категории будут одинаковыми.": "From 1 to 100. All packages will share the date, photo, and categories.",
+    "Отображение": "Display",
+    "Развёрнутый": "Expanded",
+    "Компактный": "Compact",
+    "Вид списка": "List view",
+    "Сохраняется для вас в этом браузере.": "Saved for you in this browser.",
+    "Ревизия аптечки": "Medicine box stocktake",
+    "Начать ревизию": "Start stocktake",
+    "Ревизия: ": "Stocktake: ",
+    "Проверьте каждую упаковку. Отметки можно менять до завершения.": "Check each package. You can change your selections before finishing.",
+    "Будут показаны все упаковки этой аптечки, включая закончившиеся.": "Includes every package in this medicine box, including finished ones.",
+    "На месте": "Present",
+    "Закончилась": "Finished",
+    "Не нашёл": "Not found",
+    "Сбросить отметку": "Clear selection",
+    "Проверено: ": "Checked: ",
+    "Не проверено: ": "Unchecked: ",
+    "Завершить ревизию": "Finish stocktake",
+    "Завершить ревизию?": "Finish stocktake?",
+    "Вернуться к ревизии": "Continue stocktake",
+    "Наличие изменится только у упаковок с отметками «На месте» и «Закончилась».": "Only packages marked Present or Finished will have their availability updated.",
+    "Ненайденные и непроверенные упаковки сохранятся без изменений.": "Not-found and unchecked packages will be kept unchanged.",
+    "Последняя ревизия": "Last stocktake",
+    "Посмотреть результат": "View results",
+    "Ревизия завершена": "Stocktake complete",
+    "Ненайденные упаковки": "Packages not found",
+    "Ненайденных упаковок нет.": "No packages were marked Not found.",
+    "Список изменился на другом устройстве. Обновите ревизию и проверьте новые или изменённые упаковки.": "The inventory changed on another device. Refresh the stocktake and check any new or changed packages.",
+    "Обновить ревизию": "Refresh stocktake",
+    "Отметки неизменённых упаковок сохранены. Проверьте оставшиеся.": "Selections for unchanged packages were kept. Check the remaining packages.",
+    "Аптечка удалена на другом устройстве. Ревизия закрыта.": "This medicine box was deleted on another device. The stocktake was closed.",
+    "Пока нет упаковок для ревизии.": "There are no packages to check yet.",
+    "Сохранить и завершить": "Save and finish",
     "Изменить лекарство": "Edit medicine",
     "Изменённые поля применятся ко всем упаковкам: ": "Changed fields will apply to all packages: ",
     "Остальные данные каждой упаковки сохранятся.": "Other details of each package will be kept.",
@@ -199,6 +235,8 @@ const compareExpiry = (a, b) => Number(a.expires_on === null) - Number(b.expires
 const labels = { due_90: "Истекает в течение 90 дней", due_7: "Истекает в течение 7 дней", expired: "Просрочено" };
 const icon = (name) => {
     const paths = {
+        check: '<path d="m5 12 4 4L19 6"/>',
+        minus: '<path d="M5 12h14"/>',
         menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
         bag: '<path d="M8 6V4h8v2m-12 0h16v15H4zM12 10v7m-3-3.5h6"/>',
         plus: '<path d="M12 5v14M5 12h14"/>', edit: '<path d="m4 16-1 5 5-1L20 8l-4-4L4 16Zm10-10 4 4"/>',
@@ -223,6 +261,11 @@ dialog{color:inherit;background:var(--mc-card);border:1px solid var(--mc-line);b
 .category-filter{position:relative;min-width:0}.category-filter>summary{display:flex;align-items:center;gap:8px;min-height:44px;height:100%;border:1px solid var(--mc-line);border-radius:8px;padding:10px 12px;list-style:none;color:inherit;background:var(--mc-card)}.category-filter>summary::-webkit-details-marker{display:none}.category-filter-value{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.category-filter>summary::after{content:"";width:7px;height:7px;border-right:1.7px solid currentColor;border-bottom:1.7px solid currentColor;transform:rotate(45deg);margin:0 3px 4px;flex:none}.category-filter[open]>summary::after{transform:rotate(225deg);margin-bottom:-4px}.category-filter[data-active=true]>summary{border-color:var(--mc-accent)}.category-filter-dropdown{position:absolute;z-index:5;top:calc(100% + 6px);left:0;width:320px;max-width:calc(100vw - 28px);padding:12px;border:1px solid var(--mc-line);border-radius:9px;background:var(--mc-card);box-shadow:0 8px 24px #0002}.category-filter-dropdown>.search{display:block}.category-filter-dropdown input[type=search]{font-size:14px}.category-filter-dropdown>p{font-size:12px;line-height:1.5;margin:10px 0 0}.category-filter-options{max-height:min(240px,35dvh);overflow:auto;overscroll-behavior:contain}.category-filter-option,.category-filter-all{display:flex;align-items:center;gap:8px;min-height:44px;padding:5px 2px;cursor:pointer;font-size:14px}.category-filter-option input,.category-filter-all input{width:18px;height:18px;min-height:18px;margin:0;flex:none;accent-color:var(--mc-accent)}.category-filter-all{border-bottom:1px solid var(--mc-line);margin:5px 0}.category-filter-options>p{font-size:13px;line-height:1.5;padding:0 2px}
 @media(min-width:701px) and (max-width:1100px){.category-filter-dropdown{left:auto;right:0}.filters{--mc-filter-font-size:13px;grid-template-columns:repeat(4,minmax(0,1fr))}.filters .search{grid-column:1/-1}.filters .reset-filters{grid-column:1/-1}.filters select,.filters button{min-width:0}}
 @media(max-width:700px){.medicine-header{grid-template-columns:56px minmax(0,1fr) 42px}.medicine-info{grid-column:1/-1}.medicine-actions{grid-column:3;grid-row:1}.single-pack{align-items:flex-start}main{padding:21px 14px 50px}header{padding:0 12px}.offline-label{font-size:11px}.toolbar{gap:10px;margin-bottom:18px}.kit-picker select{font-size:25px}.actions{width:100%}.actions .primary{flex:1}.filters{--mc-filter-font-size:12px;grid-template-columns:1fr 1fr}.search{grid-column:1/-1}.filters select{min-width:0}.filters .reset-filters{min-width:0;grid-column:1/-1}.medicine-header{padding:16px;gap:12px}.medicine-header.has-expired{padding-left:12px}.medicine-heading h2{font-size:17px}.photo{width:56px;height:56px}.pack,.group-footer,details>summary,.add-pack{padding-left:16px;padding-right:16px}.pack-meta{gap:10px;font-size:12px}.form-grid{grid-template-columns:minmax(0,1fr)}.field.full{grid-column:auto}dialog form{padding:20px}.summary-line{gap:10px;font-size:12px}}
+
+[hidden]{display:none!important}.settings-section{border-top:1px solid var(--mc-line);padding-top:18px;margin-top:20px}.settings-section h3{font-size:18px;margin:0 0 12px}.settings-section p{line-height:1.5}.view-switch{display:flex;gap:8px}.view-switch button{flex:1;font-size:14px}.view-switch button[aria-pressed=true]{border-color:var(--mc-accent);color:var(--mc-accent);background:color-mix(in srgb,var(--mc-accent) 9%,var(--mc-card))}.quantity-control{display:flex;gap:8px;align-items:center}.quantity-control button{width:44px;min-height:44px;padding:8px}.quantity-control input{width:90px;text-align:center;appearance:textfield}.quantity-control input::-webkit-inner-spin-button,.quantity-control input::-webkit-outer-spin-button{appearance:none;margin:0}
+.compact-medicine>summary{list-style:none;display:flex;align-items:center;gap:12px;padding:12px 16px;border-top:0;color:inherit}.compact-medicine>summary::-webkit-details-marker{display:none}.compact-medicine>summary::after{content:"";width:8px;height:8px;border-right:1.7px solid currentColor;border-bottom:1.7px solid currentColor;transform:rotate(45deg);flex:none;margin:0 4px 4px}.compact-medicine[open]>summary::after{transform:rotate(225deg)}.compact-medicine .photo{width:40px;height:40px}.compact-heading{flex:1;min-width:0}.compact-heading h2{font-size:16px;line-height:1.4;margin:0 0 3px;overflow-wrap:anywhere}.compact-heading p{margin:0;font-size:12px;color:var(--mc-muted)}.compact-heading .category-badges{margin:5px 0 0;gap:4px}.compact-heading .category-badge{font-size:11px;padding:3px 6px;gap:4px}.compact-heading ha-icon{--mdc-icon-size:16px}.compact-actions{padding:10px 16px;display:flex;gap:8px;border-top:1px solid var(--mc-line)}.compact-actions button{font-size:13px}.compact-medicine .pack{padding:14px 16px}
+.audit-bar{position:sticky;top:0;z-index:4;background:var(--mc-card);border-bottom:1px solid var(--mc-line);box-shadow:0 3px 12px #0001}.audit-bar-inner{max-width:1080px;margin:auto;padding:12px 28px;display:flex;align-items:center;gap:12px}.audit-bar-copy{flex:1;min-width:0}.audit-bar strong{display:block;font-size:16px;overflow-wrap:anywhere}.audit-progress-text{font-size:13px;color:var(--mc-muted);margin:4px 0}.audit-bar progress{display:block;width:100%;height:5px;accent-color:var(--mc-accent)}.audit-bar button{font-size:13px;flex:none}.audit-intro{margin:0 0 16px;font-size:14px;line-height:1.5;color:var(--mc-muted)}.audit-card-heading{display:flex;align-items:center;gap:12px;padding:16px 20px}.audit-card-heading h2{font-size:18px;margin:0;overflow-wrap:anywhere}.audit-card-heading .photo{width:48px;height:48px}.audit-pack{padding:16px 20px;border-top:1px solid var(--mc-line)}.audit-pack-title{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:14px}.audit-pack .category-badges{margin:10px 0}.audit-pack .note{font-size:13px;margin:8px 0}.audit-choices{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.audit-choices button{min-height:44px;font-size:13px;--choice-color:var(--mc-accent)}.audit-choices [data-state=present]{--choice-color:var(--success-color,#25836b)}.audit-choices [data-state=finished]{--choice-color:var(--warning-color,#ad6a13)}.audit-choices [data-state=missing]{--choice-color:var(--mc-danger)}.audit-choices button[aria-pressed=true]{border-color:var(--choice-color);background:color-mix(in srgb,var(--choice-color) 15%,var(--mc-card));box-shadow:inset 0 0 0 1px var(--choice-color)}.audit-choices button[aria-pressed=true] svg{color:var(--choice-color)}.audit-choices[data-answered=true] button[aria-pressed=false]{border-color:transparent;background:transparent;color:var(--mc-muted)}.audit-choices .audit-clear{margin-left:auto;color:var(--mc-muted);font-weight:400}.audit-counts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}.audit-counts div{padding:12px;border:1px solid var(--mc-line);border-radius:9px;font-size:13px}.audit-counts b{display:block;font-size:22px;margin-top:4px}.audit-missing{padding-left:20px;line-height:1.5}.audit-missing li{margin-bottom:10px;overflow-wrap:anywhere}.audit-result-footer{display:flex;justify-content:flex-end;margin-top:22px}
+@media(max-width:700px){.audit-bar-inner{padding:10px 14px;align-items:flex-start}.audit-bar strong{font-size:14px}.audit-bar button{font-size:12px;max-width:132px}.audit-pack,.audit-card-heading{padding:14px}.audit-choices{gap:5px}.audit-choices button{padding:8px;font-size:12px;flex:1}.audit-choices .audit-clear{flex:none}.audit-bar-copy{padding-top:3px}.compact-medicine>summary{padding:12px;gap:9px}}
 @media(prefers-reduced-motion:no-preference){button{transition:background .12s,border-color .12s}.medicine{animation:appear .18s ease-out}@keyframes appear{from{opacity:.5;transform:translateY(3px)}to{opacity:1;transform:none}}}
 `;
 class MedicineCabinetPanel extends HTMLElement {
@@ -241,6 +284,9 @@ class MedicineCabinetPanel extends HTMLElement {
     sort = "name";
     filterCategories = new Set();
     openGroups = new Set();
+    compactOpenGroups = new Set();
+    viewMode = "expanded";
+    audit;
     categorySelection = [];
     groupEdits = new Set();
     creatingCategory = false;
@@ -261,6 +307,8 @@ class MedicineCabinetPanel extends HTMLElement {
         this._hass = value;
         if (userChanged) {
             this.kitId = this.readSelectedKit();
+            this.viewMode = this.readViewMode();
+            this.audit = undefined;
             this.openGroups.clear();
             if (this.initialized && this.data) {
                 this.resolveSelectedKit();
@@ -313,6 +361,12 @@ class MedicineCabinetPanel extends HTMLElement {
             if (element.classList.contains("group-picker") && element.open && (!element.contains(this.root.activeElement) || this.root.activeElement?.tagName === "SUMMARY")) {
                 element.querySelector("#group-search")?.focus();
             }
+            if (element.tagName === "DETAILS" && element.dataset.compactGroup) {
+                if (element.open)
+                    this.compactOpenGroups.add(element.dataset.compactGroup);
+                else
+                    this.compactOpenGroups.delete(element.dataset.compactGroup);
+            }
             if (element.tagName === "DETAILS" && element.dataset.group) {
                 if (element.open)
                     this.openGroups.add(element.dataset.group);
@@ -335,6 +389,27 @@ class MedicineCabinetPanel extends HTMLElement {
     }
     get selectionKey() {
         return this.hass.user?.id ? `medicine_cabinet:selected_kit:${this.hass.user.id}` : null;
+    }
+    get viewKey() {
+        return this.hass.user?.id ? `medicine_cabinet:view:${this.hass.user.id}` : null;
+    }
+    readViewMode() {
+        try {
+            return this.viewKey && localStorage.getItem(this.viewKey) === "compact" ? "compact" : "expanded";
+        }
+        catch {
+            return "expanded";
+        }
+    }
+    setViewMode(mode) {
+        this.viewMode = mode;
+        try {
+            if (this.viewKey)
+                localStorage.setItem(this.viewKey, mode);
+        }
+        catch { /* The current view still works without browser storage. */ }
+        this.dialog.querySelectorAll('[data-action="set-view"]').forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mode === mode)));
+        this.renderList();
     }
     readSelectedKit() {
         try {
@@ -400,7 +475,7 @@ class MedicineCabinetPanel extends HTMLElement {
         return rows.sort((a, b) => this.sort === "name" ? this.data.groups[a.group_id].name.localeCompare(this.data.groups[b.group_id].name, this.language) || compareExpiry(a, b) : compareExpiry(a, b) || this.data.groups[a.group_id].name.localeCompare(this.data.groups[b.group_id].name, this.language) || a.number - b.number);
     }
     renderShell() {
-        this.root.innerHTML = `<style>${styles}</style><div class="app"><header><button type="button" class="icon quiet sidebar-toggle" data-action="toggle-menu" aria-label="${this.t("Открыть боковое меню")}">${icon("menu")}</button><span class="header-logo" aria-hidden="true">${icon("bag")}</span><strong>${escapeHtml(this.data?.settings?.sidebar_title || this.t("Аптечка"))}</strong><span class="offline-label"><span class="dot"></span>${this.t("Данные в Home Assistant")}</span></header><main><div class="toolbar"><div class="kit-picker"><label class="eyebrow" for="kit">${this.t("МЕСТО ХРАНЕНИЯ")}</label><select id="kit" aria-label="${this.t("Выбрать аптечку")}"></select></div><div class="actions"><button class="primary" data-action="add">${icon("plus")}${this.t("Добавить")}</button><button data-action="export">${icon("download")}${this.t("Экспорт")}</button><button class="icon" data-action="settings" aria-label="${this.t("Настройки аптечек")}">${icon("settings")}</button></div></div><div class="filters"><label class="search">${icon("search")}<span class="sr">${this.t("Поиск по названию и дополнительной информации")}</span><input id="query" type="search" placeholder="${this.t("Название или доп. информация")}" autocomplete="off"></label><select id="status" aria-label="${this.t("Срок годности")}"><option value="all">${this.t("Все сроки")}</option><option value="expired">${this.t("Просрочено")}</option><option value="due_7">${this.t("До 7 дней")}</option><option value="due_90">${this.t("От 8 до 90 дней")}</option><option value="ok">${this.t("Более 90 дней")}</option><option value="no_expiry">${this.t("Бессрочно")}</option></select><select id="availability" aria-label="${this.t("Наличие")}"><option value="all">${this.t("Любое наличие")}</option><option value="present">${this.t("Есть")}</option><option value="finished">${this.t("Закончился")}</option></select>${this.categoryFilterHtml()}<select id="sort" aria-label="${this.t("Сортировка")}"><option value="name">${this.t("По названию")}</option><option value="expiry">${this.t("Ближайший срок")}</option></select><button type="button" class="reset-filters" data-action="reset-filters">${this.t("Сбросить все фильтры")}</button></div><div id="error" class="notice" role="alert"></div><div id="summary" class="summary-line"></div><div id="list" class="cards"><p class="loading">${this.t("Загружаем аптечки…")}</p></div></main></div><dialog id="dialog"></dialog><div class="toast" role="status" aria-live="polite"></div>`;
+        this.root.innerHTML = `<style>${styles}</style><div class="app"><header><button type="button" class="icon quiet sidebar-toggle" data-action="toggle-menu" aria-label="${this.t("Открыть боковое меню")}">${icon("menu")}</button><span class="header-logo" aria-hidden="true">${icon("bag")}</span><strong>${escapeHtml(this.data?.settings?.sidebar_title || this.t("Аптечка"))}</strong><span class="offline-label"><span class="dot"></span>${this.t("Данные в Home Assistant")}</span></header><div class="audit-bar" hidden></div><main><div class="toolbar"><div class="kit-picker"><label class="eyebrow" for="kit">${this.t("МЕСТО ХРАНЕНИЯ")}</label><select id="kit" aria-label="${this.t("Выбрать аптечку")}"></select></div><div class="actions"><button class="primary" data-action="add">${icon("plus")}${this.t("Добавить")}</button><button data-action="export">${icon("download")}${this.t("Экспорт")}</button><button class="icon" data-action="settings" aria-label="${this.t("Настройки аптечек")}">${icon("settings")}</button></div></div><div class="filters"><label class="search">${icon("search")}<span class="sr">${this.t("Поиск по названию и дополнительной информации")}</span><input id="query" type="search" placeholder="${this.t("Название или доп. информация")}" autocomplete="off"></label><select id="status" aria-label="${this.t("Срок годности")}"><option value="all">${this.t("Все сроки")}</option><option value="expired">${this.t("Просрочено")}</option><option value="due_7">${this.t("До 7 дней")}</option><option value="due_90">${this.t("От 8 до 90 дней")}</option><option value="ok">${this.t("Более 90 дней")}</option><option value="no_expiry">${this.t("Бессрочно")}</option></select><select id="availability" aria-label="${this.t("Наличие")}"><option value="all">${this.t("Любое наличие")}</option><option value="present">${this.t("Есть")}</option><option value="finished">${this.t("Закончился")}</option></select>${this.categoryFilterHtml()}<select id="sort" aria-label="${this.t("Сортировка")}"><option value="name">${this.t("По названию")}</option><option value="expiry">${this.t("Ближайший срок")}</option></select><button type="button" class="reset-filters" data-action="reset-filters">${this.t("Сбросить все фильтры")}</button></div><div id="error" class="notice" role="alert"></div><div id="summary" class="summary-line"></div><div id="list" class="cards"><p class="loading">${this.t("Загружаем аптечки…")}</p></div></main></div><dialog id="dialog"></dialog><div class="toast" role="status" aria-live="polite"></div>`;
         this.root.querySelector(".app").setAttribute("lang", this.language);
         this.root.querySelector("#query").value = this.query;
         this.root.querySelector("#status").value = this.filter;
@@ -461,7 +536,12 @@ class MedicineCabinetPanel extends HTMLElement {
     renderList() {
         if (!this.data)
             return;
+        this.renderAuditBar();
         const list = this.root.querySelector("#list");
+        if (this.audit) {
+            this.renderAuditList();
+            return;
+        }
         const rows = this.visiblePackages();
         const all = Object.values(this.data.packages).filter(p => this.data.groups[p.group_id].kit_id === this.kitId);
         const present = all.filter(p => p.available);
@@ -493,10 +573,158 @@ class MedicineCabinetPanel extends HTMLElement {
             const note = notes.length > 1 ? items.filter(p => p.info).map(p => `№${p.number}: ${p.info}`).join("\n") : notes[0];
             const multiple = siblings.length > 1;
             const badges = multiple ? this.groupBadges(siblings) : this.packageBadges(items[0]);
+            if (this.viewMode === "compact")
+                return this.compactGroupHtml(group, items, siblings, nearest);
             const contents = multiple ? `<details data-group="${id}" ${this.openGroups.has(id) ? "open" : ""}><summary>${this.t("Упаковки: ")}<b>${available.length} ${this.t("в наличии")}</b>${expired ? ` · ${expired} ${this.t("просрочено")}` : ""}${finished ? ` · ${finished} ${this.t("закончились")}` : ""}${items.length !== siblings.length ? ` · ${this.t("показано ")}${items.length} ${this.t("из ")}${siblings.length}` : ""}</summary>${items.map(p => this.packageHtml(p)).join("")}</details>` : this.packageHtml(items[0], true);
             return `<article class="medicine"><div class="medicine-header ${expired ? "has-expired" : ""}"><div class="photo">${photo ? `<img data-image="${photo}" alt="${this.t("Фото ")}${escapeHtml(group.name)}">` : icon("bag")}</div><div class="medicine-heading"><h2>${escapeHtml(group.name)}</h2>${group.category_ids?.length ? `<div class="category-badges">${this.categoryBadges(group.category_ids)}</div>` : ""}<p>${nearest ? `${multiple && !nearest.no_expiry ? this.t("Ближайший срок") : this.t("Годен ДО")}: ${this.date(nearest.expires_on)}` : this.t("Все упаковки закончились")}</p>${badges}</div><div class="medicine-info ${multiple ? "multiple" : ""}"><span class="eyebrow">${this.t("Доп. информация")}</span><p class="note">${note ? escapeHtml(note) : this.t("Не указана")}</p></div><div class="medicine-actions"><button class="icon quiet" data-action="edit-group" data-group="${id}" aria-label="${this.t("Изменить ")}${escapeHtml(group.name)}">${icon("edit")}</button><button class="icon quiet" data-action="add-pack" data-group="${id}" aria-label="${this.t("Добавить упаковку ")}${escapeHtml(group.name)}">${icon("plus")}</button></div></div>${contents}${multiple ? `<div class="group-footer"><span class="small muted">${this.t("Все упаковки: ")}${siblings.length}</span><div class="pack-footer"><button data-action="toggle-group-available" data-group="${id}">${available.length ? this.t("Отметить: закончились") : this.t("Отметить: есть")}</button><button class="quiet danger" data-action="delete-group" data-group="${id}">${this.t("Удалить")}</button></div></div>` : ""}</article>`;
         }).join("");
         void this.loadPhotos();
+    }
+    compactGroupHtml(group, items, siblings, nearest) {
+        const photo = items.find(p => p.image_id)?.image_id;
+        const available = siblings.filter(p => p.available).length;
+        const expiry = nearest ? `${this.t("Годен ДО")}: ${this.date(nearest.expires_on)}` : this.t("Все упаковки закончились");
+        return `<details class="medicine compact-medicine" data-compact-group="${group.id}" ${this.compactOpenGroups.has(group.id) ? "open" : ""}><summary><div class="photo">${photo ? `<img data-image="${photo}" alt="${this.t("Фото ")}${escapeHtml(group.name)}">` : icon("bag")}</div><div class="compact-heading"><h2>${escapeHtml(group.name)}</h2><p>${this.t("Упаковок: ")}${siblings.length} · ${available} ${this.t("в наличии")} · ${expiry}</p>${group.category_ids?.length ? `<div class="category-badges">${this.categoryBadges(group.category_ids)}</div>` : ""}${this.groupBadges(siblings)}</div></summary><div class="compact-actions"><button type="button" data-action="edit-group" data-group="${group.id}">${icon("edit")}${this.t("Изменить лекарство")}</button><button type="button" data-action="add-pack" data-group="${group.id}" aria-label="${this.t("Добавить упаковку ")}${escapeHtml(group.name)}">${icon("plus")}${this.t("Добавить")}</button></div>${items.length !== siblings.length ? `<p class="small muted" style="padding:0 16px">${this.t("показано ")}${items.length} ${this.t("из ")}${siblings.length}</p>` : ""}${items.map(p => this.packageHtml(p)).join("")}</details>`;
+    }
+    viewSettingsHtml() {
+        return `<section class="settings-section"><h3>${this.t("Отображение")}</h3><div class="view-switch" role="group" aria-label="${this.t("Вид списка")}">${["expanded", "compact"].map(mode => `<button type="button" data-action="set-view" data-mode="${mode}" aria-pressed="${this.viewMode === mode}">${this.t(mode === "compact" ? "Компактный" : "Развёрнутый")}</button>`).join("")}</div><p class="small muted">${this.t("Сохраняется для вас в этом браузере.")}</p></section>`;
+    }
+    auditSettingsHtml() {
+        const kit = this.data?.kits[this.kitId];
+        if (!kit)
+            return "";
+        const hasPackages = Object.values(this.data.packages).some(p => this.data.groups[p.group_id].kit_id === kit.id);
+        return `<section class="settings-section"><h3>${this.t("Ревизия аптечки")} «${escapeHtml(kit.name)}»</h3><p class="small muted">${this.t(hasPackages ? "Будут показаны все упаковки этой аптечки, включая закончившиеся." : "Пока нет упаковок для ревизии.")}</p><button type="button" data-action="audit-start" ${hasPackages ? "" : "disabled"}>${this.t("Начать ревизию")}</button>${kit.last_audit ? `<p class="small muted">${this.t("Последняя ревизия")}: ${escapeHtml(this.dateTime(kit.last_audit.completed_at))}</p><button type="button" class="quiet" data-action="audit-result">${this.t("Посмотреть результат")}</button>` : ""}</section>`;
+    }
+    dateTime(value) {
+        return new Intl.DateTimeFormat(this.language, { dateStyle: "short", timeStyle: "short", timeZone: this.data.timezone }).format(new Date(value));
+    }
+    auditPackages(kitId) {
+        return Object.values(this.data.packages).filter(p => this.data.groups[p.group_id].kit_id === kitId)
+            .sort((a, b) => this.data.groups[a.group_id].name.localeCompare(this.data.groups[b.group_id].name, this.language) || a.number - b.number);
+    }
+    startAudit() {
+        const kit = this.data?.kits[this.kitId];
+        if (!kit)
+            return;
+        this.audit = { kitId: kit.id, name: kit.name, revision: this.data.revision, packages: structuredClone(this.auditPackages(kit.id)), groups: structuredClone(this.data.groups), choices: new Map() };
+        this.dialog.close();
+        this.render();
+        this.root.querySelector(".app").scrollTop = 0;
+        this.root.querySelector(".audit-bar strong").focus({ preventScroll: true });
+    }
+    auditCounts() {
+        const counts = { present: 0, finished: 0, missing: 0 };
+        for (const state of this.audit?.choices.values() || [])
+            counts[state]++;
+        return counts;
+    }
+    auditLabel(state) {
+        return this.t({ present: "На месте", finished: "Закончилась", missing: "Не нашёл" }[state]);
+    }
+    renderAuditBar() {
+        const bar = this.root.querySelector(".audit-bar");
+        bar.hidden = !this.audit;
+        for (const selector of [".toolbar", ".filters", "#summary"])
+            this.root.querySelector(selector).hidden = !!this.audit;
+        if (!this.audit) {
+            bar.innerHTML = "";
+            return;
+        }
+        if (!bar.childElementCount)
+            bar.innerHTML = `<div class="audit-bar-inner"><div class="audit-bar-copy"><strong tabindex="-1"></strong><p class="audit-progress-text" role="status" aria-live="polite"></p><progress aria-label="${this.t("Проверено: ")}"></progress></div><button type="button" class="primary" data-action="audit-finish">${this.t("Завершить ревизию")}</button></div>`;
+        bar.querySelector("strong").textContent = this.t("Ревизия: ") + this.audit.name;
+        bar.querySelector(".audit-progress-text").textContent = `${this.t("Проверено: ")}${this.audit.choices.size} ${this.t("из ")}${this.audit.packages.length}`;
+        const progress = bar.querySelector("progress");
+        progress.max = Math.max(1, this.audit.packages.length);
+        progress.value = this.audit.choices.size;
+    }
+    auditChoicesHtml(item) {
+        const selected = this.audit.choices.get(item.id);
+        return `<div class="audit-choices" role="group" aria-label="${this.t("Упаковка №")}${item.number}" data-answered="${!!selected}">${["present", "finished", "missing"].map(state => `<button type="button" data-action="audit-mark" data-id="${item.id}" data-state="${state}" aria-pressed="${state === selected}">${state === selected ? icon("check") : ""}${this.auditLabel(state)}</button>`).join("")}<button type="button" class="quiet icon audit-clear" data-action="audit-clear" data-id="${item.id}" aria-label="${this.t("Сбросить отметку")}" ${selected ? "" : "hidden"}>${icon("close")}</button></div>`;
+    }
+    renderAuditList() {
+        const audit = this.audit;
+        const groups = new Map();
+        for (const p of audit.packages) {
+            if (!groups.has(p.group_id))
+                groups.set(p.group_id, []);
+            groups.get(p.group_id).push(p);
+        }
+        this.root.querySelector("#list").innerHTML = `<p class="audit-intro">${this.t("Проверьте каждую упаковку. Отметки можно менять до завершения.")}</p>${[...groups].map(([id, items]) => {
+            const name = audit.groups[id].name;
+            const photo = items.find(p => p.image_id)?.image_id;
+            return `<article class="medicine audit-medicine"><div class="audit-card-heading"><div class="photo">${photo ? `<img data-image="${photo}" alt="${this.t("Фото ")}${escapeHtml(name)}">` : icon("bag")}</div><h2>${escapeHtml(name)}</h2></div>${items.map(p => `<section class="audit-pack" data-package="${p.id}"><div class="audit-pack-title"><strong>${this.t("Упаковка №")}${p.number}</strong><span>${this.t("Годен ДО")}: ${this.date(p.expires_on)}</span></div>${this.packageBadges(p)}${p.category_ids.length ? `<div class="category-badges">${this.categoryBadges(p.category_ids)}</div>` : ""}${p.info ? `<p class="note">${escapeHtml(p.info)}</p>` : ""}${this.auditChoicesHtml(p)}</section>`).join("")}</article>`;
+        }).join("")}`;
+        void this.loadPhotos();
+    }
+    markAudit(id, state) {
+        const item = this.audit?.packages.find(p => p.id === id);
+        if (!item)
+            return;
+        if (state)
+            this.audit.choices.set(id, state);
+        else
+            this.audit.choices.delete(id);
+        const row = this.root.querySelector(`.audit-pack[data-package="${CSS.escape(id)}"]`);
+        row.querySelector(".audit-choices").outerHTML = this.auditChoicesHtml(item);
+        row.querySelector(state ? `[data-state="${state}"]` : '[data-state="present"]').focus({ preventScroll: true });
+        this.renderAuditBar();
+    }
+    auditCountsHtml(counts, total) {
+        const checked = counts.present + counts.finished + counts.missing;
+        return `<div class="audit-counts">${["present", "finished", "missing"].map(state => `<div>${this.auditLabel(state)}<b>${counts[state]}</b></div>`).join("")}<div>${this.t("Не проверено: ")}<b>${Math.max(0, total - checked)}</b></div></div>`;
+    }
+    auditMissingHtml(items) {
+        if (!items.length)
+            return "";
+        return `<h3>${this.t("Ненайденные упаковки")}</h3><ul class="audit-missing">${items.map(p => `<li><strong>${escapeHtml(p.name)}</strong> · ${this.t("Упаковка №")}${p.number}<br><span class="small muted">${this.t("Годен ДО")}: ${this.date(p.expires_on)}</span></li>`).join("")}</ul>`;
+    }
+    finishAuditDialog() {
+        if (!this.audit)
+            return;
+        const missing = this.audit.packages.filter(p => this.audit.choices.get(p.id) === "missing").map(p => ({ ...p, name: this.audit.groups[p.group_id].name }));
+        this.showDialog(this.t("Завершить ревизию?"), `<p class="explanation">${escapeHtml(this.audit.name)}</p>${this.auditCountsHtml(this.auditCounts(), this.audit.packages.length)}<p class="explanation">${this.t("Наличие изменится только у упаковок с отметками «На месте» и «Закончилась».")} ${this.t("Ненайденные и непроверенные упаковки сохранятся без изменений.")}</p>${this.auditMissingHtml(missing)}`, "audit_complete", "", this.t("Сохранить и завершить"));
+        this.dialog.querySelector('.dialog-actions [data-action="close"]').textContent = this.t("Вернуться к ревизии");
+    }
+    auditResultDialog() {
+        const kit = this.data?.kits[this.kitId];
+        const report = kit?.last_audit;
+        if (!report)
+            return;
+        this.showDialog(this.t("Ревизия завершена"), `<p class="explanation">${escapeHtml(kit.name)} · ${escapeHtml(this.dateTime(report.completed_at))}</p>${this.auditCountsHtml(report.counts, report.total)}${this.auditMissingHtml(report.missing)}<p class="explanation">${this.t("Ненайденные и непроверенные упаковки сохранятся без изменений.")}</p><div class="audit-result-footer"><button type="button" data-action="close">${this.t("Закрыть")}</button></div>`, "audit_result", "", "");
+    }
+    async refreshAudit() {
+        if (!this.audit)
+            return;
+        try {
+            const data = await this.hass.callWS({ type: "medicine_cabinet/request", operation: "list" });
+            this.data = data;
+            const kit = data.kits[this.audit.kitId];
+            if (!kit) {
+                this.audit = undefined;
+                this.dialog.close();
+                this.resolveSelectedKit();
+                this.render();
+                this.toast(this.t("Аптечка удалена на другом устройстве. Ревизия закрыта."));
+                return;
+            }
+            const packages = this.auditPackages(kit.id);
+            const choices = new Map();
+            for (const p of packages) {
+                const old = this.audit.packages.find(item => item.id === p.id);
+                const choice = this.audit.choices.get(p.id);
+                if (old && choice && JSON.stringify(old) === JSON.stringify(p) && this.audit.groups[old.group_id].name === data.groups[p.group_id].name)
+                    choices.set(p.id, choice);
+            }
+            this.audit = { kitId: kit.id, name: kit.name, revision: data.revision, packages: structuredClone(packages), groups: structuredClone(data.groups), choices };
+            this.dialog.close();
+            this.render();
+            this.toast(this.t("Отметки неизменённых упаковок сохранены. Проверьте оставшиеся."));
+        }
+        catch (err) {
+            this.showError(err, true);
+        }
     }
     categoryName(category) {
         return this.language === "en" ? category.name_en || category.name : category.name;
@@ -776,6 +1004,8 @@ class MedicineCabinetPanel extends HTMLElement {
             this.renderCategoryOptions();
             this.dialog.querySelector(`[name="category_choice"][value="${CSS.escape(target.value)}"]`)?.focus();
         }
+        if (target.name === "count" && !target.value)
+            target.value = "1";
         if (target.name === "no_expiry")
             this.updateExpiryInput();
         if (target.closest("form")?.dataset.kind === "export")
@@ -897,6 +1127,25 @@ class MedicineCabinetPanel extends HTMLElement {
         const id = button.dataset.id;
         if (action === "toggle-menu")
             this.dispatchEvent(new CustomEvent("hass-toggle-menu", { bubbles: true, composed: true }));
+        else if (action === "set-view")
+            this.setViewMode(button.dataset.mode);
+        else if (action === "quantity") {
+            const input = this.dialog.querySelector('[name="count"]');
+            const value = Number(input.value || 1);
+            input.value = String(Math.min(100, Math.max(1, (Number.isFinite(value) ? Math.round(value) : 1) + Number(button.dataset.delta))));
+        }
+        else if (action === "audit-start")
+            this.startAudit();
+        else if (action === "audit-mark")
+            this.markAudit(id, button.dataset.state);
+        else if (action === "audit-clear")
+            this.markAudit(id);
+        else if (action === "audit-finish")
+            this.finishAuditDialog();
+        else if (action === "audit-refresh")
+            void this.refreshAudit();
+        else if (action === "audit-result")
+            this.auditResultDialog();
         else if (action === "add")
             this.kitId ? this.packageDialog() : this.kitDialog();
         else if (action === "add-pack")
@@ -1010,7 +1259,7 @@ class MedicineCabinetPanel extends HTMLElement {
         const image = item?.image_id || copy?.image_id || "";
         const info = item?.info ?? copy?.info ?? "";
         this.categorySelection = [...(item?.category_ids ?? copy?.category_ids ?? [])];
-        const fields = `<div class="form-grid"><div class="field full"><span id="group-label">${this.t("Препарат")}</span><input type="hidden" name="group_id" value="${escapeHtml(groupId || "")}"><details class="group-picker"><summary aria-describedby="group-label"><span class="group-value">${groupId ? escapeHtml(this.data.groups[groupId].name) : this.t("Новое лекарство")}</span></summary><div class="group-dropdown"><div class="group-search search">${icon("search")}<label><span class="sr">${this.t("Поиск препарата")}</span><input id="group-search" type="search" placeholder="${this.t("Поиск препарата")}" autocomplete="off"></label></div><button type="button" class="group-option group-new" data-action="select-group" data-group="">${this.t("Новое лекарство")}</button><div class="group-results" role="group" aria-label="${this.t("Сохранённые лекарства")}"></div></div></details></div><label class="field full">${this.t("Название")}<input name="name" maxlength="200" ${groupId ? "disabled" : "required"} value="${escapeHtml(groupId ? this.data.groups[groupId].name : "")}" placeholder="${this.t("Название, форма или дозировка")}"></label><label class="field full">${this.t("Доп. информация")}<textarea name="info" maxlength="5000" placeholder="${this.t("Дозировка, описание или ваши заметки")}">${escapeHtml(info)}</textarea></label>${this.categoryFields()}<div class="field ${item ? "" : "full"}"><div class="expiry-heading"><label for="mc-expiry">${this.t("Годен ДО")}</label><label class="check"><input name="no_expiry" type="checkbox" ${item?.no_expiry ? "checked" : ""}>${this.t("Бессрочно")}</label></div><input id="mc-expiry" name="expires_on" type="date" required value="${escapeHtml(item?.expires_on || "")}"><input class="expiry-unlimited" type="text" value="${this.t("Бессрочно")}" aria-label="${this.t("Срок годности")}" disabled hidden><small class="expiry-hint"></small></div>${item ? `<label class="field">${this.t("Наличие")}<select name="available"><option value="true">${this.t("Есть")}</option><option value="false" ${!item.available ? "selected" : ""}>${this.t("Закончился")}</option></select></label>` : ""}<div class="field full"><label for="mc-photo">${this.t("Фотография · необязательно")}</label><input type="hidden" name="image_id" value="${escapeHtml(image)}"><div class="file-row"><input id="mc-photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp"><button type="button" class="quiet" data-action="clear-photo">${this.t("Убрать")}</button></div><small class="photo-status">${image ? this.t("Используется сохранённая фотография") : this.t("JPEG, PNG или WebP, до 10 МБ. HEIC сначала сохраните как JPEG.")}</small></div></div>${item ? `<p class="explanation">${this.t("Изменение срока, включая отметку «Бессрочно», означает замену упаковки: дата добавления обновится, наличие станет «Есть».")}</p>` : ""}`;
+        const fields = `<div class="form-grid"><div class="field full"><span id="group-label">${this.t("Препарат")}</span><input type="hidden" name="group_id" value="${escapeHtml(groupId || "")}"><details class="group-picker"><summary aria-describedby="group-label"><span class="group-value">${groupId ? escapeHtml(this.data.groups[groupId].name) : this.t("Новое лекарство")}</span></summary><div class="group-dropdown"><div class="group-search search">${icon("search")}<label><span class="sr">${this.t("Поиск препарата")}</span><input id="group-search" type="search" placeholder="${this.t("Поиск препарата")}" autocomplete="off"></label></div><button type="button" class="group-option group-new" data-action="select-group" data-group="">${this.t("Новое лекарство")}</button><div class="group-results" role="group" aria-label="${this.t("Сохранённые лекарства")}"></div></div></details></div><label class="field full">${this.t("Название")}<input name="name" maxlength="200" ${groupId ? "disabled" : "required"} value="${escapeHtml(groupId ? this.data.groups[groupId].name : "")}" placeholder="${this.t("Название, форма или дозировка")}"></label><label class="field full">${this.t("Доп. информация")}<textarea name="info" maxlength="5000" placeholder="${this.t("Дозировка, описание или ваши заметки")}">${escapeHtml(info)}</textarea></label>${this.categoryFields()}${!item ? `<div class="field full"><label for="mc-count">${this.t("Количество упаковок")}</label><div class="quantity-control"><button type="button" data-action="quantity" data-delta="-1" aria-label="${this.t("Уменьшить количество")}">${icon("minus")}</button><input id="mc-count" name="count" type="number" inputmode="numeric" min="1" max="100" step="1" value="1" aria-describedby="quantity-hint"><button type="button" data-action="quantity" data-delta="1" aria-label="${this.t("Увеличить количество")}">${icon("plus")}</button></div><small id="quantity-hint">${this.t("От 1 до 100. Дата, фото и категории будут одинаковыми.")}</small></div>` : ""}<div class="field ${item ? "" : "full"}"><div class="expiry-heading"><label for="mc-expiry">${this.t("Годен ДО")}</label><label class="check"><input name="no_expiry" type="checkbox" ${item?.no_expiry ? "checked" : ""}>${this.t("Бессрочно")}</label></div><input id="mc-expiry" name="expires_on" type="date" required value="${escapeHtml(item?.expires_on || "")}"><input class="expiry-unlimited" type="text" value="${this.t("Бессрочно")}" aria-label="${this.t("Срок годности")}" disabled hidden><small class="expiry-hint"></small></div>${item ? `<label class="field">${this.t("Наличие")}<select name="available"><option value="true">${this.t("Есть")}</option><option value="false" ${!item.available ? "selected" : ""}>${this.t("Закончился")}</option></select></label>` : ""}<div class="field full"><label for="mc-photo">${this.t("Фотография · необязательно")}</label><input type="hidden" name="image_id" value="${escapeHtml(image)}"><div class="file-row"><input id="mc-photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp"><button type="button" class="quiet" data-action="clear-photo">${this.t("Убрать")}</button></div><small class="photo-status">${image ? this.t("Используется сохранённая фотография") : this.t("JPEG, PNG или WebP, до 10 МБ. HEIC сначала сохраните как JPEG.")}</small></div></div>${item ? `<p class="explanation">${this.t("Изменение срока, включая отметку «Бессрочно», означает замену упаковки: дата добавления обновится, наличие станет «Есть».")}</p>` : ""}`;
         this.showDialog(item ? `${this.t("Упаковка №")}${item.number}` : this.t("Добавить лекарство"), fields, "package_save", id);
         this.renderGroupOptions();
         this.renderCategoryOptions();
@@ -1035,7 +1284,7 @@ class MedicineCabinetPanel extends HTMLElement {
         this.showDialog(title, `<p class="explanation">${escapeHtml(text)}</p>`, operation, id, this.t("Удалить"), operation.startsWith("categor") ? "settings" : "close");
     }
     settingsDialog() {
-        this.showDialog(this.t("Аптечки и настройки"), `<div class="actions"><button type="button" data-action="kit-add">${icon("plus")}${this.t("Новая аптечка")}</button>${this.kitId ? `<button type="button" data-action="kit-edit">${this.t("Переименовать")}</button><button type="button" class="danger" data-action="kit-delete">${this.t("Удалить аптечку")}</button>` : ""}</div>${this.categoryCatalogHtml()}<p class="explanation">${this.t("Напоминания отправляются отдельно для каждой упаковки за 90 и за 7 дней. Данные и фотографии хранятся на вашем сервере.")}</p>${this.hass.user?.is_admin ? `<a class="settings-link" href="/config/integrations/integration/medicine_cabinet">${this.t("Язык, название и уведомления →")}</a>` : `<p class="explanation">${this.t("Время и получателей уведомлений настраивает администратор HA.")}</p>`}`, "settings", "", "");
+        this.showDialog(this.t("Аптечки и настройки"), `<div class="actions"><button type="button" data-action="kit-add">${icon("plus")}${this.t("Новая аптечка")}</button>${this.kitId ? `<button type="button" data-action="kit-edit">${this.t("Переименовать")}</button><button type="button" class="danger" data-action="kit-delete">${this.t("Удалить аптечку")}</button>` : ""}</div>${this.viewSettingsHtml()}${this.auditSettingsHtml()}${this.categoryCatalogHtml()}<p class="explanation">${this.t("Напоминания отправляются отдельно для каждой упаковки за 90 и за 7 дней. Данные и фотографии хранятся на вашем сервере.")}</p>${this.hass.user?.is_admin ? `<a class="settings-link" href="/config/integrations/integration/medicine_cabinet">${this.t("Язык, название и уведомления →")}</a>` : `<p class="explanation">${this.t("Время и получателей уведомлений настраивает администратор HA.")}</p>`}`, "settings", "", "");
         this.renderCategoryCatalog();
     }
     categoryCatalogHtml() {
@@ -1140,6 +1389,14 @@ class MedicineCabinetPanel extends HTMLElement {
         const fields = new FormData(form);
         const kind = form.dataset.kind;
         try {
+            if (kind === "audit_complete") {
+                const audit = this.audit;
+                await this.request("audit_complete", { kit_id: audit.kitId, checks: [...audit.choices].map(([id, state]) => ({ id, state })) }, audit.revision);
+                this.audit = undefined;
+                this.render();
+                this.auditResultDialog();
+                return;
+            }
             if (kind === "export") {
                 const format = String(fields.get("format"));
                 const filters = this.exportFilters(form);
@@ -1198,7 +1455,7 @@ class MedicineCabinetPanel extends HTMLElement {
                         payload.category_ids = [...this.categorySelection];
                 }
                 else {
-                    payload = { ...payload, kit_id: this.kitId, category_ids: [...this.categorySelection], group_id: fields.get("group_id") || null, name: fields.get("name") || "", info: fields.get("info"), no_expiry: fields.get("no_expiry") === "on", expires_on: fields.get("no_expiry") === "on" ? null : fields.get("expires_on"), available: form.dataset.id ? fields.get("available") === "true" : true, image_id: imageId || null };
+                    payload = { ...payload, count: form.dataset.id ? 1 : Number(fields.get("count") || 1), kit_id: this.kitId, category_ids: [...this.categorySelection], group_id: fields.get("group_id") || null, name: fields.get("name") || "", info: fields.get("info"), no_expiry: fields.get("no_expiry") === "on", expires_on: fields.get("no_expiry") === "on" ? null : fields.get("expires_on"), available: form.dataset.id ? fields.get("available") === "true" : true, image_id: imageId || null };
                 }
             }
             await this.request(kind, payload, Number(form.dataset.revision));
@@ -1210,7 +1467,10 @@ class MedicineCabinetPanel extends HTMLElement {
         }
         catch (err) {
             this.showError(err, true);
-            if (err.code === "conflict") {
+            if (err.code === "conflict" && kind === "audit_complete") {
+                form.querySelector(".conflict-actions").innerHTML = `<p class="explanation">${this.t("Список изменился на другом устройстве. Обновите ревизию и проверьте новые или изменённые упаковки.")}</p><button type="button" data-action="audit-refresh">${this.t("Обновить ревизию")}</button>`;
+            }
+            else if (err.code === "conflict") {
                 form.querySelector(".conflict-actions").innerHTML = `<p class="explanation">${kind === "group_delete" ? this.t("Состав аптечки изменился. Обновите список, проверьте количество упаковок и повторите удаление.") : this.t("Ваш ввод пока сохранён в форме. Скопируйте нужные изменения перед перезагрузкой записи.")}</p><button type="button" data-action="${kind.startsWith("categor") ? "reload-categories" : "reload-form"}" data-kind="${kind}" data-id="${escapeHtml(form.dataset.id || "")}">${this.t(kind.startsWith("categor") ? "Обновить список категорий" : "Перезагрузить запись")}</button>`;
             }
         }

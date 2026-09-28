@@ -3,6 +3,9 @@
 import re
 
 EN = {
+    "Некорректные отметки ревизии": "Invalid stocktake selections",
+    "Количество упаковок должно быть целым числом от 1 до 100": "Package count must be a whole number from 1 to 100",
+    "Количество можно указать только при добавлении упаковок": "Package count can only be set when adding packages",
     "Лекарство с таким названием уже есть в этой аптечке": "A medicine with this name already exists in this medicine box",
     "Категория с таким названием уже существует": "A category with this name already exists",
     "Название категории": "Category name",

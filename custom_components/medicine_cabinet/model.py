@@ -361,7 +361,59 @@ def mutate(data: dict, operation: str, payload: dict, revision: int, now: dateti
         }
         for item in result["packages"].values():
             item["category_ids"] = [key for key in item["category_ids"] if key not in removed]
+    elif operation == "audit_complete":
+        kit_id = payload.get("kit_id")
+        kit = require(result["kits"], kit_id)
+        checks = payload.get("checks")
+        if not isinstance(checks, list):
+            raise InventoryError("invalid", "Некорректные отметки ревизии")
+        seen = set()
+        counts = {"present": 0, "finished": 0, "missing": 0}
+        missing = []
+        numbers = package_numbers(result)
+        for check in checks:
+            if not isinstance(check, dict):
+                raise InventoryError("invalid", "Некорректные отметки ревизии")
+            item_id = check.get("id")
+            item = require(result["packages"], item_id)
+            group = result["groups"][item["group_id"]]
+            if group["kit_id"] != kit_id:
+                raise InventoryError("invalid", "Упаковка находится в другой аптечке")
+            state = check.get("state")
+            if not isinstance(state, str) or state not in counts or item_id in seen:
+                raise InventoryError("invalid", "Некорректные отметки ревизии")
+            seen.add(item_id)
+            counts[state] += 1
+            if state == "missing":
+                # Missing is an observation, not permission to delete or finish stock.
+                missing.append(
+                    {
+                        "name": group["name"],
+                        "number": numbers[item_id],
+                        "expires_on": item["expires_on"],
+                    }
+                )
+            elif item["available"] != (state == "present"):
+                item.update(available=state == "present", updated_at=stamp)
+        total = sum(
+            result["groups"][p["group_id"]]["kit_id"] == kit_id for p in result["packages"].values()
+        )
+        kit["last_audit"] = {
+            "completed_at": stamp,
+            "total": total,
+            "counts": counts,
+            "missing": missing,
+        }
     elif operation == "package_save":
+        count = payload.get("count", 1)
+        if type(count) is not int or not 1 <= count <= 100:
+            raise InventoryError(
+                "invalid", "Количество упаковок должно быть целым числом от 1 до 100"
+            )
+        if payload.get("id") and count != 1:
+            raise InventoryError(
+                "invalid", "Количество можно указать только при добавлении упаковок"
+            )
         kit_id = payload.get("kit_id")
         require(result["kits"], kit_id)
         group_id = payload.get("group_id")
@@ -433,6 +485,15 @@ def mutate(data: dict, operation: str, payload: dict, revision: int, now: dateti
             available=available,
             updated_at=stamp,
         )
+        # Create independent packages in one durable transaction and one revision.
+        for _ in range(count - 1):
+            extra_id = uuid4().hex
+            result["packages"][extra_id] = {
+                **deepcopy(item),
+                "id": extra_id,
+                "number": result["next_number"],
+            }
+            result["next_number"] += 1
     elif operation == "group_save":
         group_id = payload.get("id")
         group = require(result["groups"], group_id)

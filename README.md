@@ -19,6 +19,9 @@
 
 - **Multiple cabinets.** Organize medicines by storage location and switch between cabinets.
 - **Individual packages.** Each medicine can have several packages, each with its own expiry date, photos and notes.
+- **Stocktake.** Check each package from Settings, correct your selections, and finish at any point. The latest result includes packages you could not find.
+- **Multiple packages at once.** Choose a quantity when adding medicine; each package remains separately editable.
+- **Compact view.** Switch between expanded cards and a compact list in Settings.
 - **Expiry tracking.** See what has expired and what will need replacing within 90 or 7 days. Items without an expiry date can be marked as having no expiry.
 - **Reminders.** Receive notifications in Home Assistant and on selected phones.
 - **Search and filters.** Find medicines by name or notes, and filter by expiry date and availability.

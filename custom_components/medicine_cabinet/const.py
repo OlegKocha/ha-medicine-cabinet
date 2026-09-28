@@ -1,7 +1,7 @@
 """Constants for Medicine Cabinet."""
 
 DOMAIN = "medicine_cabinet"
-VERSION = "1.1.0"
+VERSION = "1.4.0"
 PANEL_URL = "medicine-cabinet"
 STORAGE_VERSION = 1
 EVENT_CHANGED = f"{DOMAIN}_changed"
