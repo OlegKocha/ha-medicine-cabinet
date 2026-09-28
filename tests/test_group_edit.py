@@ -3,7 +3,12 @@ from datetime import timedelta
 
 import pytest
 
-from custom_components.medicine_cabinet.model import InventoryError, load_inventory, mutate
+from custom_components.medicine_cabinet.model import (
+    InventoryError,
+    load_inventory,
+    mutate,
+    public_snapshot,
+)
 from tests.test_inventory import NOW, change, inventory
 
 
@@ -76,9 +81,10 @@ def test_group_edit_all_fields_and_expiry_replacement_semantics():
         now,
     )
     assert result["groups"][group]["name"] == "Новое название"
-    assert result["groups"][group]["category_ids"] == ["default_allergy"]
+    assert public_snapshot(result, now)["groups"][group]["category_ids"] == ["default_allergy"]
     for key, item in result["packages"].items():
         if item["group_id"] == group:
+            assert item["category_ids"] == ["default_allergy"]
             assert item["info"] == "Общее описание"
             assert item["image_id"] == "d" * 64
             assert item["no_expiry"] and item["expires_on"] is None

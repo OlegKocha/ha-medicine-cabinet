@@ -1,8 +1,9 @@
+import csv
 import shutil
 from copy import deepcopy
 from datetime import timedelta
 from hashlib import sha256
-from io import BytesIO
+from io import BytesIO, StringIO
 from pathlib import Path
 from unittest.mock import patch
 
@@ -12,6 +13,7 @@ from homeassistant.components import persistent_notification
 from homeassistant.components.frontend import DATA_PANELS
 from homeassistant.util import dt as dt_util
 from PIL import Image
+from pypdf import PdfReader
 
 from tests.ha_runtime import create_token, start_hass
 
@@ -111,11 +113,18 @@ async def test_real_setup_auth_crud_upload_export_and_reload(runtime):
                 )
                 assert response.status == 200, await response.text()
                 content = await response.read()
-                assert (
-                    content.startswith(b"%PDF")
-                    if format == "pdf"
-                    else "Препарат" in content.decode("utf-8-sig")
-                )
+                if format == "pdf":
+                    text = "\n".join(
+                        page.extract_text() for page in PdfReader(BytesIO(content)).pages
+                    )
+                    assert "Для питомца" in text and "Дорожная аптечка" in text
+                    assert "Дозировка и заметка" in text and "Добавлено" not in text
+                else:
+                    rows = list(
+                        csv.DictReader(StringIO(content.decode("utf-8-sig")), delimiter=";")
+                    )
+                    assert rows[0]["Категории"] == "Для питомца; Дорожная аптечка"
+                    assert rows[0]["Доп. информация"] == "Дозировка и заметка"
             response = await session.get(
                 base + f"/api/medicine_cabinet/images/{image_id}", headers=headers
             )
@@ -718,14 +727,16 @@ async def test_category_management_over_websocket_and_empty_catalog_survives_res
             data = await request("categories_clear", {})
             assert data["categories"] == {}
             assert next(iter(data["groups"].values()))["category_ids"] == []
-            assert data["packages"] == packages
+            assert data["packages"] == {
+                key: {**item, "category_ids": []} for key, item in packages.items()
+            }
     entry = hass.config_entries.async_entries("medicine_cabinet")[0]
     await hass.config_entries.async_reload(entry.entry_id)
     await hass.async_block_till_done()
     restored = hass.data["medicine_cabinet"].snapshot()
     assert restored["categories"] == {}
     assert restored["groups"] == data["groups"]
-    assert restored["packages"] == packages
+    assert restored["packages"] == data["packages"]
 
 
 async def test_group_photo_update_validates_upload_and_persists_all_packages(runtime):

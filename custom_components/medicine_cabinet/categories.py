@@ -2,7 +2,7 @@
 
 import re
 
-MAX_CATEGORIES_PER_MEDICINE = 5
+MAX_CATEGORIES_PER_PACKAGE = 5
 
 # Optional organizational labels, never assigned to medicines automatically.
 STARTER_CATEGORIES = (

@@ -7,7 +7,7 @@ from copy import deepcopy
 from datetime import date, datetime
 from uuid import uuid4
 
-from .categories import MAX_CATEGORIES_PER_MEDICINE, default_categories, valid_color, valid_icon
+from .categories import MAX_CATEGORIES_PER_PACKAGE, default_categories, valid_color, valid_icon
 
 
 class InventoryError(ValueError):
@@ -20,7 +20,7 @@ class InventoryError(ValueError):
 
 def empty_inventory() -> dict:
     return {
-        "schema": 3,
+        "schema": 4,
         "revision": 0,
         "next_number": 1,
         "kits": {},
@@ -35,7 +35,7 @@ def load_inventory(data: dict | None) -> dict:
     """Never silently replace a damaged or unsupported inventory."""
     if data is None:
         return empty_inventory()
-    if data.get("schema") not in (1, 2, 3):
+    if data.get("schema") not in (1, 2, 3, 4):
         raise InventoryError("storage_version", "Неподдерживаемая версия данных аптечки")
     result = deepcopy(data)
     for name in ("kits", "groups", "packages", "notifications"):
@@ -75,9 +75,18 @@ def load_inventory(data: dict | None) -> dict:
             or not valid_icon(category.get("icon"))
         ):
             raise InventoryError("storage_invalid", "Повреждён список категорий")
+    if result["schema"] < 4:
+        # Copy the former shared assignments before merging any duplicate groups.
+        # Each package now owns its labels independently.
+        for group in result["groups"].values():
+            validate_category_ids(result, group.get("category_ids"))
+        for item in result["packages"].values():
+            item["category_ids"] = list(result["groups"][item["group_id"]]["category_ids"])
+    for item in result["packages"].values():
+        validate_category_ids(result, item.get("category_ids"))
     for group in result["groups"].values():
-        validate_category_ids(result, group.get("category_ids"))
-    result["schema"] = 3
+        group.pop("category_ids", None)
+    result["schema"] = 4
     merge_duplicate_groups(result)
     return result
 
@@ -98,11 +107,6 @@ def merge_duplicate_groups(data: dict) -> None:
         aliases[group_id] = canonical_id
         if group_id == canonical_id:
             groups[group_id] = group
-        else:
-            combined = list(
-                dict.fromkeys(groups[canonical_id]["category_ids"] + group["category_ids"])
-            )
-            groups[canonical_id]["category_ids"] = validate_category_ids(data, combined)
     for item in data["packages"].values():
         item["group_id"] = aliases[item["group_id"]]
     data["groups"] = groups
@@ -136,7 +140,7 @@ def validate_category_ids(data: dict, value: object) -> list[str]:
     if not isinstance(value, list) or any(not isinstance(key, str) for key in value):
         raise InventoryError("invalid", "Некорректный список категорий")
     selected = list(dict.fromkeys(value))
-    if len(selected) > MAX_CATEGORIES_PER_MEDICINE:
+    if len(selected) > MAX_CATEGORIES_PER_PACKAGE:
         raise InventoryError("category_limit", "Можно выбрать не больше 5 категорий")
     for category_id in selected:
         require(data["categories"], category_id)
@@ -186,7 +190,12 @@ def public_snapshot(data: dict, now: datetime) -> dict:
     result["today"] = now.date().isoformat()
     result["timezone"] = str(now.tzinfo)
     numbers = package_numbers(data)
+    # The header is a derived union; its size is not limited by the package cap.
+    for group in result["groups"].values():
+        group["category_ids"] = []
     for item in result["packages"].values():
+        ids = result["groups"][item["group_id"]]["category_ids"]
+        ids.extend(key for key in item["category_ids"] if key not in ids)
         item["number"] = numbers[item["id"]]
         item["status"] = expiry_status(item, now.date())
         item["days_remaining"] = (
@@ -224,7 +233,14 @@ def select_packages(
             continue
         if availability == "finished" and item["available"]:
             continue
-        result.append({**item, "name": group["name"], "kit_name": data["kits"][kit_id]["name"]})
+        result.append(
+            {
+                **item,
+                "name": group["name"],
+                "kit_name": data["kits"][kit_id]["name"],
+                "categories": [deepcopy(data["categories"][key]) for key in item["category_ids"]],
+            }
+        )
 
     def expiry_key(item):
         # Explicitly put undated packages after every real date.
@@ -343,8 +359,8 @@ def mutate(data: dict, operation: str, payload: dict, revision: int, now: dateti
         result["categories"] = {
             key: category for key, category in result["categories"].items() if key not in removed
         }
-        for group in result["groups"].values():
-            group["category_ids"] = [key for key in group["category_ids"] if key not in removed]
+        for item in result["packages"].values():
+            item["category_ids"] = [key for key in item["category_ids"] if key not in removed]
     elif operation == "package_save":
         kit_id = payload.get("kit_id")
         require(result["kits"], kit_id)
@@ -370,15 +386,7 @@ def mutate(data: dict, operation: str, payload: dict, revision: int, now: dateti
                     "id": group_id,
                     "kit_id": kit_id,
                     "name": name,
-                    "category_ids": [],
                 }
-        group = result["groups"][group_id]
-        if "category_ids" in payload:
-            selected = validate_category_ids(result, payload["category_ids"])
-            if not payload.get("group_id"):
-                # A typed duplicate name joins its existing group; keep earlier labels.
-                selected = list(dict.fromkeys(group["category_ids"] + selected))
-            group["category_ids"] = validate_category_ids(result, selected)
         no_expiry = payload.get("no_expiry", False)
         if type(no_expiry) is not bool:
             raise InventoryError("invalid", "Некорректное значение «Бессрочно»")
@@ -414,6 +422,9 @@ def mutate(data: dict, operation: str, payload: dict, revision: int, now: dateti
             result["next_number"] += 1
             result["packages"][item_id] = item
         item.update(
+            category_ids=validate_category_ids(
+                result, payload.get("category_ids", item.get("category_ids", []))
+            ),
             group_id=group_id,
             expires_on=expires,
             no_expiry=no_expiry,
@@ -441,11 +452,11 @@ def mutate(data: dict, operation: str, payload: dict, revision: int, now: dateti
                     "duplicate_medicine", "Лекарство с таким названием уже есть в этой аптечке"
                 )
             group["name"] = name
-        if "category_ids" in payload:
-            group["category_ids"] = validate_category_ids(result, payload["category_ids"])
         # One atomic patch for the whole group, including packages hidden by filters.
         # Omitted fields keep their per-package values.
         updates = {}
+        if "category_ids" in payload:
+            updates["category_ids"] = validate_category_ids(result, payload["category_ids"])
         if "info" in payload:
             updates["info"] = text_field(payload["info"], "Доп. информация", 5000)
         if "image_id" in payload:
@@ -472,7 +483,7 @@ def mutate(data: dict, operation: str, payload: dict, revision: int, now: dateti
                 continue
             changed = any(item.get(key) != value for key, value in updates.items())
             replaced = "expires_on" in updates and item["expires_on"] != updates["expires_on"]
-            item.update(updates)
+            item.update(deepcopy(updates))
             if replaced:
                 item.update(added_at=stamp, generation=item["generation"] + 1, available=True)
             if changed:

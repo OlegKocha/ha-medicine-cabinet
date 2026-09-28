@@ -447,7 +447,7 @@ async def test_legacy_inventory_migration_preserves_dates_ids_and_notifications(
     await repo.change(
         "kit_save", {"id": kit, "name": "Дача после обновления"}, repo.data["revision"]
     )
-    assert store.data["schema"] == 3
+    assert store.data["schema"] == 4
     assert store.data["packages"] == data["packages"]
     assert store.data["notifications"] == data["notifications"]
     legacy["packages"][item_id]["expires_on"] = None

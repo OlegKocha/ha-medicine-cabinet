@@ -167,6 +167,7 @@ test('group editor applies name notes date availability and categories to all pa
  await page.getByRole('textbox',{name:'Название',exact:true}).fill('Общее лекарство');
  await page.getByRole('textbox',{name:'Доп. информация',exact:true}).fill('Общая заметка');
  await page.locator('[name=expires_on]').fill('2032-03-03');
+ await page.getByRole('checkbox',{name:'Заменить категории у всех упаковок',exact:true}).check();
  await page.locator('.category-picker > summary').click();
  await page.locator('.category-create > summary').click();
  const category=`Общая ${testInfo.project.name} ${Date.now()}`;
