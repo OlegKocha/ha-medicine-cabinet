@@ -194,7 +194,7 @@ def test_filter_and_snapshot_do_not_leak_notification_state():
 
 def test_invalid_storage_not_silently_reset():
     with pytest.raises(InventoryError):
-        load_inventory({"schema": 3})
+        load_inventory({"schema": 4})
     with pytest.raises(InventoryError):
         load_inventory({"schema": 1})
 
@@ -442,10 +442,12 @@ async def test_legacy_inventory_migration_preserves_dates_ids_and_notifications(
     store.data = deepcopy(legacy)
     repo = Repository(store, lambda: NOW)
     await repo.load()
-    assert repo.data == data
-    assert legacy == original and store.data == original
-    await repo.change("kit_save", {"id": kit, "name": "Дача после обновления"}, data["revision"])
-    assert store.data["schema"] == 2
+    assert repo.data == {**data, "revision": data["revision"] + 1}
+    assert legacy == original and store.data == repo.data
+    await repo.change(
+        "kit_save", {"id": kit, "name": "Дача после обновления"}, repo.data["revision"]
+    )
+    assert store.data["schema"] == 3
     assert store.data["packages"] == data["packages"]
     assert store.data["notifications"] == data["notifications"]
     legacy["packages"][item_id]["expires_on"] = None

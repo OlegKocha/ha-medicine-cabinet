@@ -113,7 +113,7 @@ class CabinetManager:
 
     async def async_change(self, operation, payload, revision):
         image_id = payload.get("image_id")
-        if operation == "package_save" and image_id:
+        if operation in ("package_save", "group_save") and image_id:
             # Validate identifier before constructing a filesystem path.
             import re
 

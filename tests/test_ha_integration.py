@@ -64,6 +64,18 @@ async def test_real_setup_auth_crud_upload_export_and_reload(runtime):
 
             initial = await request("list")
             assert initial["success"]
+            assert len(initial["result"]["categories"]) == 21
+            initial = await request(
+                "category_save",
+                {"name": "Для питомца", "color": "#229977", "icon": "mdi:cat"},
+                initial["result"]["revision"],
+            )
+            assert initial["success"], initial
+            category_id = next(
+                c["id"]
+                for c in initial["result"]["categories"].values()
+                if c["name"] == "Для питомца"
+            )
             result = await request("kit_save", {"name": "Дача"}, initial["result"]["revision"])
             assert result["success"], result
             snapshot = result["result"]
@@ -82,6 +94,7 @@ async def test_real_setup_auth_crud_upload_export_and_reload(runtime):
                 {
                     "kit_id": kit,
                     "name": "Препарат",
+                    "category_ids": [category_id, "default_travel"],
                     "info": "Дозировка и заметка",
                     "expires_on": (dt_util.now().date() + timedelta(days=120)).isoformat(),
                     "image_id": image_id,
@@ -110,7 +123,14 @@ async def test_real_setup_auth_crud_upload_export_and_reload(runtime):
         entry = hass.config_entries.async_entries("medicine_cabinet")[0]
         await hass.config_entries.async_reload(entry.entry_id)
         await hass.async_block_till_done()
-        assert hass.data["medicine_cabinet"].snapshot()["packages"] == snapshot["packages"]
+        restored = hass.data["medicine_cabinet"].snapshot()
+        assert restored["packages"] == snapshot["packages"]
+        assert restored["categories"] == snapshot["categories"]
+        assert restored["groups"] == snapshot["groups"]
+        assert next(iter(restored["groups"].values()))["category_ids"] == [
+            category_id,
+            "default_travel",
+        ]
         _, _, regular_token = await create_token(hass, "Семья", False)
         response = await session.post(
             base + "/api/medicine_cabinet/export/csv",
@@ -642,3 +662,131 @@ async def test_export_expiry_selection_and_finished_union(runtime):
     assert {
         k: p for k, p in manager.repo.data["packages"].items() if k in before["packages"]
     } == before["packages"]
+
+
+async def test_category_management_over_websocket_and_empty_catalog_survives_restart(runtime):
+    hass, base, token = runtime
+    async with aiohttp.ClientSession() as session:
+        async with session.ws_connect(base + "/api/websocket") as ws:
+            assert (await ws.receive_json())["type"] == "auth_required"
+            await ws.send_json({"type": "auth", "access_token": token})
+            assert (await ws.receive_json())["type"] == "auth_ok"
+            sequence = 0
+            revision = None
+
+            async def request(operation, payload=None):
+                nonlocal sequence, revision
+                sequence += 1
+                message = {
+                    "id": sequence,
+                    "type": "medicine_cabinet/request",
+                    "operation": operation,
+                }
+                if payload is not None:
+                    message.update(payload=payload, revision=revision)
+                await ws.send_json(message)
+                result = await ws.receive_json()
+                assert result["success"], result
+                revision = result["result"]["revision"]
+                return result["result"]
+
+            await request("list")
+            data = await request("kit_save", {"name": "Тест"})
+            kit = next(iter(data["kits"]))
+            data = await request(
+                "package_save",
+                {
+                    "kit_id": kit,
+                    "name": "Пластырь",
+                    "no_expiry": True,
+                    "category_ids": ["default_allergy", "default_travel"],
+                },
+            )
+            packages = data["packages"]
+            data = await request(
+                "category_save",
+                {
+                    "id": "default_allergy",
+                    "name": "Своя категория",
+                    "color": "#112233",
+                    "icon": "mdi:cat",
+                },
+            )
+            assert data["categories"]["default_allergy"]["name"] == "Своя категория"
+            data = await request("category_delete", {"id": "default_allergy"})
+            assert next(iter(data["groups"].values()))["category_ids"] == ["default_travel"]
+            data = await request("categories_clear", {})
+            assert data["categories"] == {}
+            assert next(iter(data["groups"].values()))["category_ids"] == []
+            assert data["packages"] == packages
+    entry = hass.config_entries.async_entries("medicine_cabinet")[0]
+    await hass.config_entries.async_reload(entry.entry_id)
+    await hass.async_block_till_done()
+    restored = hass.data["medicine_cabinet"].snapshot()
+    assert restored["categories"] == {}
+    assert restored["groups"] == data["groups"]
+    assert restored["packages"] == packages
+
+
+async def test_group_photo_update_validates_upload_and_persists_all_packages(runtime):
+    hass, base, token = runtime
+    headers = {"Authorization": f"Bearer {token}"}
+    async with aiohttp.ClientSession() as session:
+        async with session.ws_connect(base + "/api/websocket") as ws:
+            assert (await ws.receive_json())["type"] == "auth_required"
+            await ws.send_json({"type": "auth", "access_token": token})
+            assert (await ws.receive_json())["type"] == "auth_ok"
+            sequence = 0
+            state = hass.data["medicine_cabinet"].snapshot()
+
+            async def request(operation, payload):
+                nonlocal sequence, state
+                sequence += 1
+                await ws.send_json(
+                    {
+                        "id": sequence,
+                        "type": "medicine_cabinet/request",
+                        "operation": operation,
+                        "payload": payload,
+                        "revision": state["revision"],
+                    }
+                )
+                response = await ws.receive_json()
+                if response["success"]:
+                    state = response["result"]
+                return response
+
+            assert (await request("kit_save", {"name": "Групповое редактирование"}))["success"]
+            kit = next(iter(state["kits"]))
+            for date in ("2030-01-01", "2031-02-02"):
+                assert (
+                    await request(
+                        "package_save",
+                        {"kit_id": kit, "name": "Препарат", "expires_on": date, "info": date},
+                    )
+                )["success"]
+            group = next(iter(state["groups"]))
+            before = deepcopy(state)
+            bad = await request("group_save", {"id": group, "kit_id": kit, "image_id": "f" * 64})
+            assert bad["success"] is False
+            assert "Фотография не найдена" in bad["error"]["message"]
+            assert hass.data["medicine_cabinet"].snapshot() == before
+            photo = BytesIO()
+            Image.new("RGB", (50, 50), "#dd6633").save(photo, "PNG")
+            response = await session.post(
+                base + "/api/medicine_cabinet/images", data=photo.getvalue(), headers=headers
+            )
+            assert response.status == 200
+            image = (await response.json())["image_id"]
+            assert (await request("group_save", {"id": group, "kit_id": kit, "image_id": image}))[
+                "success"
+            ]
+            for key, item in state["packages"].items():
+                assert item["image_id"] == image
+                assert item["expires_on"] == before["packages"][key]["expires_on"]
+                assert item["info"] == before["packages"][key]["info"]
+                assert item["added_at"] == before["packages"][key]["added_at"]
+    entry = hass.config_entries.async_entries("medicine_cabinet")[0]
+    await hass.config_entries.async_reload(entry.entry_id)
+    await hass.async_block_till_done()
+    assert hass.data["medicine_cabinet"].snapshot()["packages"] == state["packages"]

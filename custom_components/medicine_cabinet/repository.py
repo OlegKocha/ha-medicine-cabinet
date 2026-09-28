@@ -22,9 +22,9 @@ class Repository:
         async with self.lock:
             stored = await self.store.async_load()
             loaded = load_inventory(stored)
-            if stored is not None and loaded["groups"] != stored["groups"]:
-                # Commit a group migration before publishing it; older open forms
-                # must refresh instead of submitting removed group identifiers.
+            if stored is not None and loaded != stored:
+                # Persist schema/catalog migrations before publishing; older open forms
+                # must refresh instead of submitting stale identifiers.
                 loaded["revision"] += 1
                 await self.store.async_save(loaded)
             self.data = loaded

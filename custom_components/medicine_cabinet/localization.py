@@ -3,6 +3,14 @@
 import re
 
 EN = {
+    "Лекарство с таким названием уже есть в этой аптечке": "A medicine with this name already exists in this medicine box",
+    "Категория с таким названием уже существует": "A category with this name already exists",
+    "Название категории": "Category name",
+    "Повреждён список категорий": "The category catalog is damaged",
+    "Некорректный список категорий": "Invalid category selection",
+    "Можно выбрать не больше 5 категорий": "Choose no more than 5 categories",
+    "Укажите цвет в формате #RRGGBB": "Enter a color in #RRGGBB format",
+    "Укажите значок Home Assistant, например mdi:pill": "Enter a Home Assistant icon, for example mdi:pill",
     "Истекает в течение 90 дней": "Expires within 90 days",
     "Истекает в течение 7 дней": "Expires within 7 days",
     "Просрочено": "Expired",

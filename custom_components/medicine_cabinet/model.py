@@ -7,6 +7,8 @@ from copy import deepcopy
 from datetime import date, datetime
 from uuid import uuid4
 
+from .categories import MAX_CATEGORIES_PER_MEDICINE, default_categories, valid_color, valid_icon
+
 
 class InventoryError(ValueError):
     """A user-correctable inventory error."""
@@ -18,11 +20,12 @@ class InventoryError(ValueError):
 
 def empty_inventory() -> dict:
     return {
-        "schema": 2,
+        "schema": 3,
         "revision": 0,
         "next_number": 1,
         "kits": {},
         "groups": {},
+        "categories": default_categories(),
         "packages": {},
         "notifications": {},
     }
@@ -32,7 +35,7 @@ def load_inventory(data: dict | None) -> dict:
     """Never silently replace a damaged or unsupported inventory."""
     if data is None:
         return empty_inventory()
-    if data.get("schema") not in (1, 2):
+    if data.get("schema") not in (1, 2, 3):
         raise InventoryError("storage_version", "Неподдерживаемая версия данных аптечки")
     result = deepcopy(data)
     for name in ("kits", "groups", "packages", "notifications"):
@@ -54,7 +57,27 @@ def load_inventory(data: dict | None) -> dict:
                 raise InventoryError("storage_invalid", "Повреждён срок годности упаковки")
         else:
             parse_date(item["expires_on"])
-    result["schema"] = 2
+    if result["schema"] < 3:
+        result["categories"] = default_categories()
+        for group in result["groups"].values():
+            group["category_ids"] = []
+    if not isinstance(result.get("categories"), dict):
+        raise InventoryError("storage_invalid", "Повреждён список категорий")
+    for category_id, category in result["categories"].items():
+        if (
+            not isinstance(category, dict)
+            or category.get("id") != category_id
+            or not isinstance(category.get("name"), str)
+            or not category["name"].strip()
+            or len(category["name"]) > 100
+            or ("name_en" in category and not isinstance(category["name_en"], str))
+            or not valid_color(category.get("color"))
+            or not valid_icon(category.get("icon"))
+        ):
+            raise InventoryError("storage_invalid", "Повреждён список категорий")
+    for group in result["groups"].values():
+        validate_category_ids(result, group.get("category_ids"))
+    result["schema"] = 3
     merge_duplicate_groups(result)
     return result
 
@@ -75,6 +98,11 @@ def merge_duplicate_groups(data: dict) -> None:
         aliases[group_id] = canonical_id
         if group_id == canonical_id:
             groups[group_id] = group
+        else:
+            combined = list(
+                dict.fromkeys(groups[canonical_id]["category_ids"] + group["category_ids"])
+            )
+            groups[canonical_id]["category_ids"] = validate_category_ids(data, combined)
     for item in data["packages"].values():
         item["group_id"] = aliases[item["group_id"]]
     data["groups"] = groups
@@ -102,6 +130,17 @@ def require(items: dict, key: object) -> dict:
     if not isinstance(key, str) or key not in items:
         raise InventoryError("not_found", "Запись не найдена. Обновите страницу")
     return items[key]
+
+
+def validate_category_ids(data: dict, value: object) -> list[str]:
+    if not isinstance(value, list) or any(not isinstance(key, str) for key in value):
+        raise InventoryError("invalid", "Некорректный список категорий")
+    selected = list(dict.fromkeys(value))
+    if len(selected) > MAX_CATEGORIES_PER_MEDICINE:
+        raise InventoryError("category_limit", "Можно выбрать не больше 5 категорий")
+    for category_id in selected:
+        require(data["categories"], category_id)
+    return selected
 
 
 def expiry_status(item: dict, today: date) -> str:
@@ -141,7 +180,9 @@ def package_numbers(data: dict) -> dict[str, int]:
 
 
 def public_snapshot(data: dict, now: datetime) -> dict:
-    result = {key: deepcopy(data[key]) for key in ("revision", "kits", "groups", "packages")}
+    result = {
+        key: deepcopy(data[key]) for key in ("revision", "kits", "groups", "packages", "categories")
+    }
     result["today"] = now.date().isoformat()
     result["timezone"] = str(now.tzinfo)
     numbers = package_numbers(data)
@@ -250,6 +291,60 @@ def mutate(data: dict, operation: str, payload: dict, revision: int, now: dateti
             k: v for k, v in result["packages"].items() if v["group_id"] not in group_ids
         }
         result["groups"] = {k: v for k, v in result["groups"].items() if k not in group_ids}
+    elif operation == "category_save":
+        name = " ".join(
+            text_field(payload.get("name"), "Название категории", 100, required=True).split()
+        )
+        color = payload.get("color")
+        icon = payload.get("icon")
+        if not valid_color(color):
+            raise InventoryError("invalid", "Укажите цвет в формате #RRGGBB")
+        if not valid_icon(icon):
+            raise InventoryError("invalid", "Укажите значок Home Assistant, например mdi:pill")
+        category_id = payload.get("id")
+        category = require(result["categories"], category_id) if category_id else None
+        # Reuse names on creation; renaming must not collide with another category.
+        existing = next(
+            (
+                c
+                for c in result["categories"].values()
+                if c["id"] != category_id
+                and medicine_name_key(name)
+                in (medicine_name_key(c["name"]), medicine_name_key(c.get("name_en", "")))
+            ),
+            None,
+        )
+        if category is not None:
+            if existing is not None:
+                raise InventoryError(
+                    "duplicate_category", "Категория с таким названием уже существует"
+                )
+            # Keep built-in translations when only changing appearance. A custom
+            # replacement name is user text and is shown verbatim in both languages.
+            if name not in (category["name"], category.get("name_en")):
+                category["name"] = name
+                category.pop("name_en", None)
+            category.update(color=color.lower(), icon=icon)
+        elif existing is None:
+            category_id = uuid4().hex
+            result["categories"][category_id] = {
+                "id": category_id,
+                "name": name,
+                "color": color.lower(),
+                "icon": icon,
+            }
+    elif operation in ("category_delete", "categories_clear"):
+        if operation == "category_delete":
+            category_id = payload.get("id")
+            require(result["categories"], category_id)
+            removed = {category_id}
+        else:
+            removed = set(result["categories"])
+        result["categories"] = {
+            key: category for key, category in result["categories"].items() if key not in removed
+        }
+        for group in result["groups"].values():
+            group["category_ids"] = [key for key in group["category_ids"] if key not in removed]
     elif operation == "package_save":
         kit_id = payload.get("kit_id")
         require(result["kits"], kit_id)
@@ -271,7 +366,19 @@ def mutate(data: dict, operation: str, payload: dict, revision: int, now: dateti
             )
             if group_id is None:
                 group_id = uuid4().hex
-                result["groups"][group_id] = {"id": group_id, "kit_id": kit_id, "name": name}
+                result["groups"][group_id] = {
+                    "id": group_id,
+                    "kit_id": kit_id,
+                    "name": name,
+                    "category_ids": [],
+                }
+        group = result["groups"][group_id]
+        if "category_ids" in payload:
+            selected = validate_category_ids(result, payload["category_ids"])
+            if not payload.get("group_id"):
+                # A typed duplicate name joins its existing group; keep earlier labels.
+                selected = list(dict.fromkeys(group["category_ids"] + selected))
+            group["category_ids"] = validate_category_ids(result, selected)
         no_expiry = payload.get("no_expiry", False)
         if type(no_expiry) is not bool:
             raise InventoryError("invalid", "Некорректное значение «Бессрочно»")
@@ -315,6 +422,61 @@ def mutate(data: dict, operation: str, payload: dict, revision: int, now: dateti
             available=available,
             updated_at=stamp,
         )
+    elif operation == "group_save":
+        group_id = payload.get("id")
+        group = require(result["groups"], group_id)
+        kit_id = payload.get("kit_id")
+        require(result["kits"], kit_id)
+        if group["kit_id"] != kit_id:
+            raise InventoryError("invalid", "Препарат находится в другой аптечке")
+        if "name" in payload:
+            name = text_field(payload["name"], "Название препарата", 200, required=True)
+            if any(
+                other["id"] != group_id
+                and other["kit_id"] == kit_id
+                and medicine_name_key(other["name"]) == medicine_name_key(name)
+                for other in result["groups"].values()
+            ):
+                raise InventoryError(
+                    "duplicate_medicine", "Лекарство с таким названием уже есть в этой аптечке"
+                )
+            group["name"] = name
+        if "category_ids" in payload:
+            group["category_ids"] = validate_category_ids(result, payload["category_ids"])
+        # One atomic patch for the whole group, including packages hidden by filters.
+        # Omitted fields keep their per-package values.
+        updates = {}
+        if "info" in payload:
+            updates["info"] = text_field(payload["info"], "Доп. информация", 5000)
+        if "image_id" in payload:
+            image_id = payload["image_id"]
+            if image_id is not None and (
+                not isinstance(image_id, str) or not re.fullmatch(r"[a-f0-9]{64}", image_id)
+            ):
+                raise InventoryError("invalid", "Некорректная фотография")
+            updates["image_id"] = image_id
+        if "available" in payload:
+            if type(payload["available"]) is not bool:
+                raise InventoryError("invalid", "Некорректное наличие")
+            updates["available"] = payload["available"]
+        if "no_expiry" in payload or "expires_on" in payload:
+            no_expiry = payload.get("no_expiry", False)
+            if type(no_expiry) is not bool:
+                raise InventoryError("invalid", "Некорректное значение «Бессрочно»")
+            updates["no_expiry"] = no_expiry
+            updates["expires_on"] = (
+                None if no_expiry else parse_date(payload.get("expires_on")).isoformat()
+            )
+        for item in result["packages"].values():
+            if item["group_id"] != group_id:
+                continue
+            changed = any(item.get(key) != value for key, value in updates.items())
+            replaced = "expires_on" in updates and item["expires_on"] != updates["expires_on"]
+            item.update(updates)
+            if replaced:
+                item.update(added_at=stamp, generation=item["generation"] + 1, available=True)
+            if changed:
+                item["updated_at"] = stamp
     elif operation in ("group_set_available", "group_delete"):
         group_id = payload.get("id")
         group = require(result["groups"], group_id)

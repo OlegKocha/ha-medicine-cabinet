@@ -55,25 +55,23 @@ test('real inventory: cabinet, photo-free item, duplicate spoiler, edit, search 
  await expect(medicine.locator('.pack [data-action=edit]')).toHaveCount(2);
  await expect(page.locator('#list')).not.toContainText('Срок не истёк');
  await medicine.locator('summary').click();
- await medicine.getByRole('button',{name:'Изменить Тестовый препарат',exact:true}).click();
- await page.locator('dialog').getByRole('button',{name:/Упаковка №2/}).click();
+ await medicine.locator('summary').click();
+ await medicine.getByRole('button',{name:'Изменить упаковку №2',exact:true}).click();
  await expect(page.locator('input[name=expires_on]')).toHaveValue('2030-12-01');
  await page.locator('textarea[name=info]').fill('Другая заметка второй упаковки');
  await page.getByRole('button',{name:'Сохранить',exact:true}).click();
  await expect(page.locator('dialog')).not.toBeVisible();
  await expect(medicine.locator('.medicine-header')).toContainText('№2: Другая заметка');
- await medicine.locator('summary').click();
  await expect(medicine.locator('.pack').first()).toContainText('Особая заметка');
  await expect(medicine.locator('.note').first()).toContainText('<img src=x onerror=alert(1)>');
  await expect(page.locator('.note img')).toHaveCount(0);
- await medicine.getByRole('button',{name:'Изменить Тестовый препарат',exact:true}).click();
- await page.locator('dialog').getByRole('button',{name:/Упаковка №1/}).click();
+ await medicine.getByRole('button',{name:'Изменить упаковку №1',exact:true}).click();
  await page.locator('input[name=expires_on]').fill('2031-01-01');
  await page.getByRole('button',{name:'Сохранить',exact:true}).click();
  await expect(page.locator('dialog')).not.toBeVisible();
  await expect(medicine.locator('.medicine-header')).not.toContainText('Просрочено');
  await expect(medicine.locator('.badges')).toHaveCount(0);
- // The per-package pencil edits exactly that package, independently of the header picker.
+ // The per-package pencil edits exactly that package, independently of the group editor.
  await medicine.getByRole('button',{name:'Изменить упаковку №2',exact:true}).click();
  await expect(page.locator('input[name=expires_on]')).toHaveValue('2030-12-01');
  const dueDate=await page.evaluate(async()=>{
@@ -156,7 +154,7 @@ test('upload a photograph, preserve it after reconnect, and export CSV',async({p
  expect(csv).toMatch(/;\d{2}\.\d{2}\.\d{4}\r\n$/);
  // A single package is editable directly from its header.
  await page.getByRole('button',{name:'Изменить Упаковка с фото',exact:true}).click();
- await expect(page.getByRole('heading',{name:'Упаковка №1',exact:true})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Изменить лекарство',exact:true})).toBeVisible();
  await expect(page.locator('input[name=expires_on]')).toHaveValue('2030-01-01');
 });
 
@@ -409,9 +407,8 @@ test('no-expiry checkbox, mixed packages, default alphabet, filters and exports'
  await medicine.locator('summary').click();
  await expect(medicine.locator('.pack').first()).toContainText('Бессрочно');
  await expect(medicine.locator('.pack').nth(1)).toContainText('01.01.2030');
- await medicine.getByRole('button',{name:'Изменить Аптечные ножницы',exact:true}).click();
- await expect(page.locator('.package-choice').first()).toContainText('Годен ДО: Бессрочно');
- await page.locator('.package-choice').first().click();
+ await medicine.getByRole('button',{name:'Изменить упаковку №1',exact:true}).click();
+ await expect(page.locator('.expiry-unlimited')).toBeVisible();
  await noExpiry.uncheck();
  await date.fill('2029-01-01');
  await page.getByRole('button',{name:'Сохранить',exact:true}).click();
@@ -500,7 +497,7 @@ test('language options update sidebar and panel, preserve custom text, and expor
   const panels=await page.evaluate(()=>window.testHass.callWS({type:'get_panels'}));
   expect(panels['medicine-cabinet'].title).toBe(custom);
   await page.getByRole('button',{name:'Medicine box settings'}).click();
-  await expect(page.locator('dialog').getByRole('heading')).toBeFocused();
+  await expect(page.locator('dialog').getByRole('heading', { level: 2 })).toBeFocused();
   await page.getByRole('button',{name:'New medicine box',exact:true}).click();
   const kit=`English ${testInfo.project.name} ${Date.now()}`;
   await page.getByRole('textbox',{name:'Name',exact:true}).fill(kit);
@@ -523,7 +520,7 @@ test('language options update sidebar and panel, preserve custom text, and expor
   await page.screenshot({path:`tmp/ui-english-${testInfo.project.name}.png`,fullPage:true});
   for(const format of ['csv','pdf']){
    await page.getByRole('button',{name:'Export',exact:true}).click();
-   await expect(page.locator('dialog').getByRole('heading')).toBeFocused();
+   await expect(page.locator('dialog').getByRole('heading', { level: 2 })).toBeFocused();
    await expect(page.getByRole('checkbox',{name:'Include all finished packages'})).toBeChecked();
    await expect(page.locator('select[name=expiry]')).toContainText('Within 90 days, including expired');
    await expect(page.locator('dialog').getByRole('heading')).toHaveText(`Download medicine box «${kit}»`);
