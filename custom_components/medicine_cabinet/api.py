@@ -14,7 +14,6 @@ from homeassistant.util import dt as dt_util
 from .compat import vol
 from .const import DOMAIN, EVENT_CHANGED, MAX_IMAGE_BYTES
 from .export import export_csv, export_pdf
-from .images import save_image
 from .localization import error_message
 from .model import InventoryError, select_export_packages, select_packages
 from .settings import entry_options
@@ -45,13 +44,31 @@ def manager_for(hass):
 async def websocket_request(hass, connection, msg):
     try:
         manager = manager_for(hass)
-        if msg["operation"] == "list":
+        if msg["operation"] in ("storage_info", "storage_cleanup", "storage_clear"):
+            if connection.user is None or not connection.user.is_admin:
+                raise InventoryError("unauthorized", "Доступно только администратору")
+            if msg["operation"] == "storage_info":
+                result = await manager.async_storage_info()
+            else:
+                result = await manager.async_storage_change(
+                    msg["operation"], msg["payload"], msg.get("revision")
+                )
+        elif msg["operation"] == "list":
             result = manager.snapshot()
         else:
             result = await manager.async_change(
                 msg["operation"], msg["payload"], msg.get("revision")
             )
         connection.send_result(msg["id"], result)
+    except OSError:
+        connection.send_error(
+            msg["id"],
+            "storage_error",
+            localized_error(
+                hass,
+                "Не удалось обработать файлы хранилища. Обновите сведения и повторите действие",
+            ),
+        )
     except InventoryError as err:
         connection.send_error(msg["id"], err.code, localized_error(hass, err))
 
@@ -78,6 +95,7 @@ class ImageUploadView(HomeAssistantView):
     async def post(self, request):
         try:
             manager = manager_for(request.app["hass"])
+            epoch = manager.media_epoch
             if request.content_length and request.content_length > MAX_IMAGE_BYTES:
                 raise InventoryError("invalid_image", "Фото должно быть не больше 10 МБ")
             data = bytearray()
@@ -86,9 +104,7 @@ class ImageUploadView(HomeAssistantView):
                 if len(data) > MAX_IMAGE_BYTES:
                     raise InventoryError("invalid_image", "Фото должно быть не больше 10 МБ")
             async with self.lock:
-                image_id = await manager.hass.async_add_executor_job(
-                    save_image, bytes(data), manager.media_dir
-                )
+                image_id = await manager.async_save_image(bytes(data), epoch)
             return web.json_response({"image_id": image_id})
         except InventoryError as err:
             return web.json_response(
@@ -117,6 +133,51 @@ class ImageView(HomeAssistantView):
             path,
             headers={"Cache-Control": "private, max-age=3600", "X-Content-Type-Options": "nosniff"},
         )
+
+
+class BackupView(HomeAssistantView):
+    url = f"/api/{DOMAIN}/backup"
+    name = f"api:{DOMAIN}:backup"
+    requires_auth = True
+
+    async def get(self, request):
+        if not request["hass_user"].is_admin:
+            raise web.HTTPForbidden()
+        hass = request.app["hass"]
+        try:
+            archive, size = await manager_for(hass).async_backup()
+        except (InventoryError, OSError) as err:
+            message = (
+                str(err)
+                if isinstance(err, InventoryError)
+                else "Не удалось обработать файлы хранилища. Обновите сведения и повторите действие"
+            )
+            return web.json_response({"message": localized_error(hass, message)}, status=400)
+        response = web.StreamResponse(
+            headers={
+                "Content-Type": "application/zip",
+                "Content-Length": str(size),
+                "Content-Disposition": f'attachment; filename="hamb-backup-{dt_util.now():%Y-%m-%d-%H%M%S}.zip"',
+                "Cache-Control": "no-store",
+            }
+        )
+        try:
+            await response.prepare(request)
+            while True:
+                read = hass.async_add_executor_job(archive.read, 256 * 1024)
+                try:
+                    chunk = await asyncio.shield(read)
+                except asyncio.CancelledError:
+                    # Do not close the file while the executor is reading it.
+                    await read
+                    raise
+                if not chunk:
+                    break
+                await response.write(chunk)
+            await response.write_eof()
+            return response
+        finally:
+            archive.close()
 
 
 class ExportView(HomeAssistantView):
@@ -193,3 +254,4 @@ def async_register_api(hass):
     hass.http.register_view(ImageUploadView())
     hass.http.register_view(ImageView())
     hass.http.register_view(ExportView())
+    hass.http.register_view(BackupView())

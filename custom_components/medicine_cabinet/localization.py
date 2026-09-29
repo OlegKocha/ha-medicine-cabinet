@@ -3,6 +3,11 @@
 import re
 
 EN = {
+    "Доступно только администратору": "Administrator access required",
+    "Обновите сведения о хранилище": "Refresh the storage details",
+    "Подтвердите удаление всех данных": "Confirm deletion of all inventory data",
+    "Не хватает фотографий. Исправьте записи перед созданием копии": "Some photos are missing. Fix the affected records before creating a backup",
+    "Не удалось обработать файлы хранилища. Обновите сведения и повторите действие": "Could not process storage files. Refresh storage details and try again",
     "Некорректные отметки ревизии": "Invalid stocktake selections",
     "Количество упаковок должно быть целым числом от 1 до 100": "Package count must be a whole number from 1 to 100",
     "Количество можно указать только при добавлении упаковок": "Package count can only be set when adding packages",

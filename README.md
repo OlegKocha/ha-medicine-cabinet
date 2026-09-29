@@ -19,7 +19,7 @@
 
 - **Multiple cabinets.** Organize medicines by storage location and switch between cabinets.
 - **Individual packages.** Each medicine can have several packages, each with its own expiry date, photos and notes.
-- **Stocktake.** Check each package from Settings, correct your selections, and finish at any point. The latest result includes packages you could not find.
+- **Stocktake.** Check each package from Settings, correct your selections, and finish at any point. Mark packages as present or finished / missing; the latter updates availability without deleting the records.
 - **Multiple packages at once.** Choose a quantity when adding medicine; each package remains separately editable.
 - **Compact view.** Switch between expanded cards and a compact list in Settings.
 - **Expiry tracking.** See what has expired and what will need replacing within 90 or 7 days. Items without an expiry date can be marked as having no expiry.
@@ -78,6 +78,10 @@ By default, the entire cabinet is exported. PDFs include photos and package deta
 Records and photos are stored on your server and included in backups of your Home Assistant configuration. Cabinets are shared by all users signed in to that server.
 
 For a manual transfer, keep the records file at `/config/.storage/medicine_cabinet` and the photos directory at `/config/medicine_cabinet/images/`.
+
+Administrators can open **Settings (gear) → Data and storage** to download a ZIP backup containing all cabinets, medicines, categories, stocktake results and referenced photos. Restore instructions are included in the archive. Integration settings are not included.
+
+The same dialog can remove unused photos or delete all inventory data and photos while keeping the integration configured. Unused uploads less than 24 hours old are kept to protect open forms. Deleting all data requires confirmation and does not delete downloaded files or existing Home Assistant backups.
 
 Removing the integration from Devices & services preserves your data. You can access it again after adding HAMB back.
 

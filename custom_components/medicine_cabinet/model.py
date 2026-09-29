@@ -290,7 +290,9 @@ def mutate(data: dict, operation: str, payload: dict, revision: int, now: dateti
         )
     result = deepcopy(data)
     stamp = now.isoformat()
-    if operation == "kit_save":
+    if operation == "storage_clear":
+        result = {**empty_inventory(), "revision": data["revision"], "categories": {}}
+    elif operation == "kit_save":
         name = text_field(payload.get("name"), "Название аптечки", 100, required=True)
         item_id = payload.get("id")
         if item_id:

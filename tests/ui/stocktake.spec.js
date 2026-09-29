@@ -93,12 +93,14 @@ test('stocktake choices can be corrected, finish stays visible, and partial resu
  await page.locator('#query').fill('ничего');await start(page);
  await expect(page.locator('.audit-pack')).toHaveCount(8);await expect(page.locator('.filters')).toBeHidden();
  const first=page.locator('.audit-pack').nth(0),second=page.locator('.audit-pack').nth(1);
+ await expect(first.locator('.audit-choices [data-state]')).toHaveCount(2);
+ await expect(page.locator('[data-state=missing]')).toHaveCount(0);
  await first.getByRole('button',{name:'На месте',exact:true}).click();
  await expect(first.locator('[data-state=present]')).toHaveAttribute('aria-pressed','true');
- await first.getByRole('button',{name:'Закончилась',exact:true}).click();
+ await first.getByRole('button',{name:'Закончилось / отсутствует',exact:true}).click();
  await expect(first.locator('[data-state=present]')).toHaveAttribute('aria-pressed','false');
  await expect(first.locator('[data-state=finished]')).toHaveAttribute('aria-pressed','true');
- await second.getByRole('button',{name:'Не нашёл',exact:true}).click();
+ await second.getByRole('button',{name:'Закончилось / отсутствует',exact:true}).click();
  await expect(page.locator('.audit-progress-text')).toHaveText('Проверено: 2 из 8');
  expect((await packages(page)).every(p=>p.available)).toBe(true);
  await page.locator('.audit-pack').last().scrollIntoViewIfNeeded();
@@ -109,13 +111,15 @@ test('stocktake choices can be corrected, finish stays visible, and partial resu
  await expect(page.locator('.audit-progress-text')).toHaveText('Проверено: 2 из 8');
  await finish.click();await page.getByRole('button',{name:'Сохранить и завершить',exact:true}).click();
  await expect(page.getByRole('heading',{name:'Ревизия завершена',exact:true})).toBeVisible();
- await expect(page.locator('.audit-missing')).toContainText('Пенталгин');
+ await expect(page.locator('.audit-missing')).toHaveCount(0);
  const after=await packages(page);expect(after[0].available).toBe(false);
- for(const item of after.slice(1))expect(item).toEqual(before.find(p=>p.id===item.id));
- expect((await snapshot(page)).kits[kit].last_audit.counts).toEqual({present:0,finished:1,missing:1});
+ expect(after[1].available).toBe(false);
+ for(const item of after.slice(2))expect(item).toEqual(before.find(p=>p.id===item.id));
+ expect((await snapshot(page)).kits[kit].last_audit.counts).toEqual({present:0,finished:2,missing:0});
  await close(page);await expect(page.locator('#query')).toHaveValue('ничего');
  await page.reload();await settings(page);await page.locator('[data-action=audit-result]').click();
- await expect(page.locator('.audit-missing')).toContainText('Упаковка №2');
+ await expect(page.locator('.audit-missing')).toHaveCount(0);
+ await expect(page.locator('.audit-counts')).toContainText('Закончилось / отсутствует');
 });
 
 test('stocktake can finish immediately and clearing a choice returns it to unchecked',async({page})=>{
@@ -152,6 +156,7 @@ test('English settings, quantity and stocktake labels are translated',async({pag
  await settings(page);await expect(page.getByRole('button',{name:'Compact',exact:true})).toBeVisible();
  await page.getByRole('button',{name:'Start stocktake',exact:true}).click();await page.getByRole('button',{name:'Present',exact:true}).click();
  await expect(page.locator('.audit-progress-text')).toHaveText('Checked: 1 of 1');
+ await expect(page.getByRole('button',{name:'Finished / missing',exact:true})).toBeVisible();
  await page.getByRole('button',{name:'Finish stocktake',exact:true}).click();await page.getByRole('button',{name:'Save and finish',exact:true}).click();
  await expect(page.getByRole('heading',{name:'Stocktake complete'})).toBeVisible();
 });

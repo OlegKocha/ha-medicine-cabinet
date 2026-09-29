@@ -14,15 +14,18 @@ from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
 
 from .const import DOMAIN, EVENT_CHANGED, PANEL_URL, STORAGE_VERSION
+from .images import save_image
 from .localization import tr
 from .model import (
     InventoryError,
+    mutate,
     notification_key,
     notification_stage,
     parse_date,
 )
 from .repository import Repository
 from .settings import entry_options
+from .storage_tools import build_backup, clean_photos, storage_info
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -37,6 +40,7 @@ class CabinetManager:
         self.media_dir = Path(hass.config.path(DOMAIN, "images"))
         self._last_date = None
         self._stopped = False
+        self.media_epoch = 0
         self._tick_lock = asyncio.Lock()
         self._notification_ids: set[str] = hass.data.setdefault(f"{DOMAIN}_notices", set())
 
@@ -111,19 +115,104 @@ class CabinetManager:
     def changed(self):
         self.hass.bus.async_fire(EVENT_CHANGED)
 
-    async def async_change(self, operation, payload, revision):
-        image_id = payload.get("image_id")
-        if operation in ("package_save", "group_save") and image_id:
-            # Validate identifier before constructing a filesystem path.
-            import re
+    def _require_storage(self, revision=None):
+        if self._stopped or not self.repo.accept_changes:
+            raise InventoryError("not_loaded", "Интеграция перезагружается. Повторите действие")
+        if revision is not None and (
+            type(revision) is not int or revision != self.repo.data["revision"]
+        ):
+            raise InventoryError(
+                "conflict",
+                "Данные изменились на другом устройстве. Обновите список и повторите изменение",
+            )
 
-            if not isinstance(image_id, str) or not re.fullmatch(r"[a-f0-9]{64}", image_id):
-                raise InventoryError("invalid", "Некорректная фотография")
-            if not await self.hass.async_add_executor_job(
-                (self.media_dir / f"{image_id}.jpg").is_file
-            ):
-                raise InventoryError("invalid", "Фотография не найдена. Загрузите её снова")
-        await self.repo.change(operation, payload, revision)
+    async def _file_job(self, function, *args):
+        # Keep the repository lock until the filesystem worker has really finished.
+        future = self.hass.async_add_executor_job(function, *args)
+        try:
+            return await asyncio.shield(future)
+        except asyncio.CancelledError:
+            result = await future
+            if function is build_backup:
+                result[0].close()
+            raise
+
+    async def async_save_image(self, content, epoch):
+        async with self.repo.lock:
+            self._require_storage()
+            if epoch != self.media_epoch:
+                raise InventoryError(
+                    "conflict",
+                    "Данные изменились на другом устройстве. Обновите список и повторите изменение",
+                )
+            return await self._file_job(save_image, content, self.media_dir)
+
+    async def async_storage_info(self):
+        async with self.repo.lock:
+            self._require_storage()
+            return await self._file_job(
+                storage_info, self.repo.data, self.media_dir, dt_util.now().timestamp()
+            )
+
+    async def async_backup(self):
+        async with self.repo.lock:
+            self._require_storage()
+            return await self._file_job(
+                build_backup, self.repo.data, self.media_dir, dt_util.now().isoformat()
+            )
+
+    async def async_storage_change(self, operation, payload, revision):
+        if operation not in ("storage_cleanup", "storage_clear"):
+            raise InventoryError("invalid", "Неизвестное действие")
+        committed = False
+        try:
+            async with self.repo.lock:
+                self._require_storage()
+                if type(revision) is not int:
+                    raise InventoryError("invalid", "Обновите сведения о хранилище")
+                self._require_storage(revision)
+                if operation == "storage_clear":
+                    if payload.get("confirmation") != "DELETE":
+                        raise InventoryError("invalid", "Подтвердите удаление всех данных")
+                    # Commit the empty inventory first. A failed save must not delete photos.
+                    changed = mutate(self.repo.data, operation, payload, revision, dt_util.now())
+                    await self.repo.store.async_save(changed)
+                    self.repo.data = changed
+                    self.media_epoch += 1
+                    committed = True
+                result = await self._file_job(
+                    lambda: clean_photos(
+                        self.repo.data,
+                        self.media_dir,
+                        dt_util.now().timestamp(),
+                        all_photos=operation == "storage_clear",
+                    )
+                )
+                result["storage"] = await self._file_job(
+                    storage_info, self.repo.data, self.media_dir, dt_util.now().timestamp()
+                )
+        finally:
+            if committed:
+                # A cleanup failure must still publish the already-durable reset.
+                self.changed()
+                await self.async_tick(force=True)
+        return result
+
+    async def async_change(self, operation, payload, revision):
+        async with self.repo.lock:
+            self._require_storage()
+            image_id = payload.get("image_id")
+            if operation in ("package_save", "group_save") and image_id:
+                # Validate identifier before constructing a filesystem path.
+                import re
+
+                if not isinstance(image_id, str) or not re.fullmatch(r"[a-f0-9]{64}", image_id):
+                    raise InventoryError("invalid", "Некорректная фотография")
+                if not await self._file_job((self.media_dir / f"{image_id}.jpg").is_file):
+                    raise InventoryError("invalid", "Фотография не найдена. Загрузите её снова")
+            changed = mutate(self.repo.data, operation, payload, revision, dt_util.now())
+            await self.repo.store.async_save(changed)
+            self.repo.data = changed
         self.changed()
         await self.async_tick(force=True)
         return self.snapshot()

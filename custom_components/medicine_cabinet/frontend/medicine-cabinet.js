@@ -1,6 +1,54 @@
 "use strict";
 /** Local translations. User-entered names and notes are never translated. */
 const english = {
+    "Данные и хранилища": "Data and storage",
+    "Все аптечки этого сервера. Данные общие для всех пользователей.": "All medicine boxes on this server. Inventory is shared by all users.",
+    "Загрузка…": "Loading…",
+    "Назад к настройкам": "Back to Settings",
+    "Аптечек: ": "Medicine boxes: ",
+    "Фотографий: ": "Photos: ",
+    "МБ": "MB",
+    "КБ": "KB",
+    "Б": "B",
+    "Резервная копия": "Backup",
+    "ZIP со всеми аптечками, лекарствами, категориями, результатами ревизий и используемыми фотографиями. Настройки интеграции не включены. Инструкция по восстановлению находится внутри архива.": "A ZIP with all medicine boxes, medicines, categories, stocktake results, and referenced photos. Integration settings are not included. Restore instructions are inside the archive.",
+    "Не найдено фотографий: ": "Missing photos: ",
+    "Загрузите их заново или уберите из записей перед созданием копии.": "Upload them again or remove them from the affected records before backing up.",
+    "Скачать резервную копию ZIP": "Download ZIP backup",
+    "Неиспользуемые фотографии": "Unused photos",
+    "Удалятся только фото, которые не используются ни в одной упаковке. Загрузки за последние 24 часа сохраняются, чтобы не мешать открытым формам.": "Only photos unused by any package will be deleted. Uploads from the last 24 hours are kept to protect forms still being edited.",
+    "Можно очистить: ": "Ready to clean: ",
+    "Недавние загрузки, пока сохранены: ": "Recent uploads kept for now: ",
+    "Очистить неиспользуемые фото": "Clean up unused photos",
+    "Удаление данных": "Delete inventory",
+    "Удалятся все аптечки, лекарства, категории, результаты ревизий и фотографии. Интеграция, язык, название панели и настройки уведомлений останутся.": "All medicine boxes, medicines, categories, stocktake results, and photos will be deleted. The integration, language, sidebar title, and notification settings will remain.",
+    "Скачанные файлы и резервные копии Home Assistant не удаляются.": "Downloaded files and Home Assistant backups are not deleted.",
+    "Удалить все данные аптечки": "Delete all inventory data",
+    "Повторить": "Retry",
+    "Будут удалены данные всех пользователей: ": "Data belonging to all users will be deleted: ",
+    "аптечек, ": "medicine boxes, ",
+    "упаковок, ": "packages, ",
+    "категорий и ": "categories, and ",
+    "фотографий.": "photos.",
+    "Сначала скачайте резервную копию, если хотите сохранить данные.": "Download a backup first if you want to keep the data.",
+    "Для подтверждения введите ": "To confirm, type ",
+    "Будут удалены неиспользуемые фотографии: ": "Unused photos to delete: ",
+    "Фотографии существующих упаковок сохранятся.": "Photos referenced by existing packages will be kept.",
+    "Удалить все данные аптечки?": "Delete all inventory data?",
+    "Очистить неиспользуемые фото?": "Clean up unused photos?",
+    "Удалить все данные": "Delete all data",
+    "Очистить": "Clean up",
+    "Создание копии…": "Creating backup…",
+    "Резервная копия подготовлена для скачивания": "Backup is ready to download",
+    "Все данные аптечки удалены": "All inventory data deleted",
+    "Удалено файлов: ": "Files deleted: ",
+    "Часть файлов не удалось удалить. Проверьте права на папку фотографий и повторите очистку.": "Some files could not be deleted. Check permissions on the photos folder and try again.",
+    "Обновить сведения о хранилище": "Refresh storage details",
+    "Закончилось / отсутствует": "Finished / missing",
+    "«На месте» вернёт упаковку в наличие. «Закончилось / отсутствует» отметит её как закончившуюся.": "Present puts a package back in stock. Finished / missing marks it as finished.",
+    "Непроверенные упаковки сохранятся без изменений.": "Unchecked packages will be kept unchanged.",
+    "Не найдено (предыдущая ревизия)": "Not found (previous stocktake)",
+    "Старые отметки «Не нашёл» сохранены без изменения наличия.": "Previous Not found selections are preserved without changing availability.",
     "Количество упаковок": "Number of packages",
     "Уменьшить количество": "Decrease quantity",
     "Увеличить количество": "Increase quantity",
@@ -266,6 +314,7 @@ dialog{color:inherit;background:var(--mc-card);border:1px solid var(--mc-line);b
 .compact-medicine>summary{list-style:none;display:flex;align-items:center;gap:12px;padding:12px 16px;border-top:0;color:inherit}.compact-medicine>summary::-webkit-details-marker{display:none}.compact-medicine>summary::after{content:"";width:8px;height:8px;border-right:1.7px solid currentColor;border-bottom:1.7px solid currentColor;transform:rotate(45deg);flex:none;margin:0 4px 4px}.compact-medicine[open]>summary::after{transform:rotate(225deg)}.compact-medicine .photo{width:40px;height:40px}.compact-heading{flex:1;min-width:0}.compact-heading h2{font-size:16px;line-height:1.4;margin:0 0 3px;overflow-wrap:anywhere}.compact-heading p{margin:0;font-size:12px;color:var(--mc-muted)}.compact-heading .category-badges{margin:5px 0 0;gap:4px}.compact-heading .category-badge{font-size:11px;padding:3px 6px;gap:4px}.compact-heading ha-icon{--mdc-icon-size:16px}.compact-actions{padding:10px 16px;display:flex;gap:8px;border-top:1px solid var(--mc-line)}.compact-actions button{font-size:13px}.compact-medicine .pack{padding:14px 16px}
 .audit-bar{position:sticky;top:0;z-index:4;background:var(--mc-card);border-bottom:1px solid var(--mc-line);box-shadow:0 3px 12px #0001}.audit-bar-inner{max-width:1080px;margin:auto;padding:12px 28px;display:flex;align-items:center;gap:12px}.audit-bar-copy{flex:1;min-width:0}.audit-bar strong{display:block;font-size:16px;overflow-wrap:anywhere}.audit-progress-text{font-size:13px;color:var(--mc-muted);margin:4px 0}.audit-bar progress{display:block;width:100%;height:5px;accent-color:var(--mc-accent)}.audit-bar button{font-size:13px;flex:none}.audit-intro{margin:0 0 16px;font-size:14px;line-height:1.5;color:var(--mc-muted)}.audit-card-heading{display:flex;align-items:center;gap:12px;padding:16px 20px}.audit-card-heading h2{font-size:18px;margin:0;overflow-wrap:anywhere}.audit-card-heading .photo{width:48px;height:48px}.audit-pack{padding:16px 20px;border-top:1px solid var(--mc-line)}.audit-pack-title{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:14px}.audit-pack .category-badges{margin:10px 0}.audit-pack .note{font-size:13px;margin:8px 0}.audit-choices{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.audit-choices button{min-height:44px;font-size:13px;--choice-color:var(--mc-accent)}.audit-choices [data-state=present]{--choice-color:var(--success-color,#25836b)}.audit-choices [data-state=finished]{--choice-color:var(--warning-color,#ad6a13)}.audit-choices [data-state=missing]{--choice-color:var(--mc-danger)}.audit-choices button[aria-pressed=true]{border-color:var(--choice-color);background:color-mix(in srgb,var(--choice-color) 15%,var(--mc-card));box-shadow:inset 0 0 0 1px var(--choice-color)}.audit-choices button[aria-pressed=true] svg{color:var(--choice-color)}.audit-choices[data-answered=true] button[aria-pressed=false]{border-color:transparent;background:transparent;color:var(--mc-muted)}.audit-choices .audit-clear{margin-left:auto;color:var(--mc-muted);font-weight:400}.audit-counts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}.audit-counts div{padding:12px;border:1px solid var(--mc-line);border-radius:9px;font-size:13px}.audit-counts b{display:block;font-size:22px;margin-top:4px}.audit-missing{padding-left:20px;line-height:1.5}.audit-missing li{margin-bottom:10px;overflow-wrap:anywhere}.audit-result-footer{display:flex;justify-content:flex-end;margin-top:22px}
 @media(max-width:700px){.audit-bar-inner{padding:10px 14px;align-items:flex-start}.audit-bar strong{font-size:14px}.audit-bar button{font-size:12px;max-width:132px}.audit-pack,.audit-card-heading{padding:14px}.audit-choices{gap:5px}.audit-choices button{padding:8px;font-size:12px;flex:1}.audit-choices .audit-clear{flex:none}.audit-bar-copy{padding-top:3px}.compact-medicine>summary{padding:12px;gap:9px}}
+.storage-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px;margin:16px 0}.storage-summary b{display:block;margin-top:4px;font-size:17px}.storage-section{padding:16px 0;border-top:1px solid var(--mc-line)}.storage-section h3{font-size:17px;margin:0 0 8px}.storage-section p{font-size:14px;line-height:1.5;margin:8px 0 14px}.storage-section button{max-width:100%;font-size:14px}.storage-danger h3{color:var(--mc-danger)}.audit-choices [data-state=finished]{white-space:normal}.audit-choices .audit-clear{max-width:44px}
 @media(prefers-reduced-motion:no-preference){button{transition:background .12s,border-color .12s}.medicine{animation:appear .18s ease-out}@keyframes appear{from{opacity:.5;transform:translateY(3px)}to{opacity:1;transform:none}}}
 `;
 class MedicineCabinetPanel extends HTMLElement {
@@ -614,13 +663,13 @@ class MedicineCabinetPanel extends HTMLElement {
         this.root.querySelector(".audit-bar strong").focus({ preventScroll: true });
     }
     auditCounts() {
-        const counts = { present: 0, finished: 0, missing: 0 };
+        const counts = { present: 0, finished: 0 };
         for (const state of this.audit?.choices.values() || [])
             counts[state]++;
         return counts;
     }
     auditLabel(state) {
-        return this.t({ present: "На месте", finished: "Закончилась", missing: "Не нашёл" }[state]);
+        return this.t({ present: "На месте", finished: "Закончилось / отсутствует" }[state]);
     }
     renderAuditBar() {
         const bar = this.root.querySelector(".audit-bar");
@@ -641,7 +690,7 @@ class MedicineCabinetPanel extends HTMLElement {
     }
     auditChoicesHtml(item) {
         const selected = this.audit.choices.get(item.id);
-        return `<div class="audit-choices" role="group" aria-label="${this.t("Упаковка №")}${item.number}" data-answered="${!!selected}">${["present", "finished", "missing"].map(state => `<button type="button" data-action="audit-mark" data-id="${item.id}" data-state="${state}" aria-pressed="${state === selected}">${state === selected ? icon("check") : ""}${this.auditLabel(state)}</button>`).join("")}<button type="button" class="quiet icon audit-clear" data-action="audit-clear" data-id="${item.id}" aria-label="${this.t("Сбросить отметку")}" ${selected ? "" : "hidden"}>${icon("close")}</button></div>`;
+        return `<div class="audit-choices" role="group" aria-label="${this.t("Упаковка №")}${item.number}" data-answered="${!!selected}">${["present", "finished"].map(state => `<button type="button" data-action="audit-mark" data-id="${item.id}" data-state="${state}" aria-pressed="${state === selected}">${state === selected ? icon("check") : ""}${this.auditLabel(state)}</button>`).join("")}<button type="button" class="quiet icon audit-clear" data-action="audit-clear" data-id="${item.id}" aria-label="${this.t("Сбросить отметку")}" ${selected ? "" : "hidden"}>${icon("close")}</button></div>`;
     }
     renderAuditList() {
         const audit = this.audit;
@@ -672,8 +721,8 @@ class MedicineCabinetPanel extends HTMLElement {
         this.renderAuditBar();
     }
     auditCountsHtml(counts, total) {
-        const checked = counts.present + counts.finished + counts.missing;
-        return `<div class="audit-counts">${["present", "finished", "missing"].map(state => `<div>${this.auditLabel(state)}<b>${counts[state]}</b></div>`).join("")}<div>${this.t("Не проверено: ")}<b>${Math.max(0, total - checked)}</b></div></div>`;
+        const checked = counts.present + counts.finished + (counts.missing || 0);
+        return `<div class="audit-counts">${["present", "finished"].map(state => `<div>${this.auditLabel(state)}<b>${counts[state]}</b></div>`).join("")}${counts.missing ? `<div>${this.t("Не найдено (предыдущая ревизия)")}<b>${counts.missing}</b></div>` : ""}<div>${this.t("Не проверено: ")}<b>${Math.max(0, total - checked)}</b></div></div>`;
     }
     auditMissingHtml(items) {
         if (!items.length)
@@ -683,8 +732,7 @@ class MedicineCabinetPanel extends HTMLElement {
     finishAuditDialog() {
         if (!this.audit)
             return;
-        const missing = this.audit.packages.filter(p => this.audit.choices.get(p.id) === "missing").map(p => ({ ...p, name: this.audit.groups[p.group_id].name }));
-        this.showDialog(this.t("Завершить ревизию?"), `<p class="explanation">${escapeHtml(this.audit.name)}</p>${this.auditCountsHtml(this.auditCounts(), this.audit.packages.length)}<p class="explanation">${this.t("Наличие изменится только у упаковок с отметками «На месте» и «Закончилась».")} ${this.t("Ненайденные и непроверенные упаковки сохранятся без изменений.")}</p>${this.auditMissingHtml(missing)}`, "audit_complete", "", this.t("Сохранить и завершить"));
+        this.showDialog(this.t("Завершить ревизию?"), `<p class="explanation">${escapeHtml(this.audit.name)}</p>${this.auditCountsHtml(this.auditCounts(), this.audit.packages.length)}<p class="explanation">${this.t("«На месте» вернёт упаковку в наличие. «Закончилось / отсутствует» отметит её как закончившуюся.")} ${this.t("Непроверенные упаковки сохранятся без изменений.")}</p>`, "audit_complete", "", this.t("Сохранить и завершить"));
         this.dialog.querySelector('.dialog-actions [data-action="close"]').textContent = this.t("Вернуться к ревизии");
     }
     auditResultDialog() {
@@ -692,7 +740,7 @@ class MedicineCabinetPanel extends HTMLElement {
         const report = kit?.last_audit;
         if (!report)
             return;
-        this.showDialog(this.t("Ревизия завершена"), `<p class="explanation">${escapeHtml(kit.name)} · ${escapeHtml(this.dateTime(report.completed_at))}</p>${this.auditCountsHtml(report.counts, report.total)}${this.auditMissingHtml(report.missing)}<p class="explanation">${this.t("Ненайденные и непроверенные упаковки сохранятся без изменений.")}</p><div class="audit-result-footer"><button type="button" data-action="close">${this.t("Закрыть")}</button></div>`, "audit_result", "", "");
+        this.showDialog(this.t("Ревизия завершена"), `<p class="explanation">${escapeHtml(kit.name)} · ${escapeHtml(this.dateTime(report.completed_at))}</p>${this.auditCountsHtml(report.counts, report.total)}${this.auditMissingHtml(report.missing)}${report.missing.length ? `<p class="explanation">${this.t("Старые отметки «Не нашёл» сохранены без изменения наличия.")}</p>` : ""}<p class="explanation">${this.t("Непроверенные упаковки сохранятся без изменений.")}</p><div class="audit-result-footer"><button type="button" data-action="close">${this.t("Закрыть")}</button></div>`, "audit_result", "", "");
     }
     async refreshAudit() {
         if (!this.audit)
@@ -1193,6 +1241,14 @@ class MedicineCabinetPanel extends HTMLElement {
             const count = Object.values(this.data.packages).filter(p => p.group_id === group.id).length;
             this.confirmDialog("group_delete", group.id, this.t("Удалить все упаковки?"), `${this.t("Вы действительно хотите удалить все упаковки лекарства «")}${group.name}»? ${this.t("Количество: ")}${count} ${this.t("шт.")}`);
         }
+        else if (action === "storage")
+            void this.storageDialog();
+        else if (action === "storage-backup")
+            void this.storageBackup(button);
+        else if (action === "storage-cleanup-confirm")
+            this.storageConfirm(false);
+        else if (action === "storage-clear-confirm")
+            this.storageConfirm(true);
         else if (action === "settings")
             this.settingsDialog();
         else if (action === "export")
@@ -1283,8 +1339,123 @@ class MedicineCabinetPanel extends HTMLElement {
     confirmDialog(operation, id, title, text) {
         this.showDialog(title, `<p class="explanation">${escapeHtml(text)}</p>`, operation, id, this.t("Удалить"), operation.startsWith("categor") ? "settings" : "close");
     }
+    storage;
+    storageBusy = false;
+    fileSize(bytes) {
+        const [divisor, unit] = bytes >= 1024 * 1024 ? [1024 * 1024, "МБ"] : bytes >= 1024 ? [1024, "КБ"] : [1, "Б"];
+        return new Intl.NumberFormat(this.language, { maximumFractionDigits: 1 }).format(bytes / Number(divisor)) + " " + this.t(String(unit));
+    }
+    async storageDialog() {
+        if (!this.hass.user?.is_admin || this.storageBusy)
+            return;
+        this.storage = undefined;
+        this.showDialog(this.t("Данные и хранилища"), `<p class="explanation">${this.t("Все аптечки этого сервера. Данные общие для всех пользователей.")}</p><div class="storage-content" aria-live="polite">${this.t("Загрузка…")}</div><div class="audit-result-footer"><button type="button" data-action="settings">${this.t("Назад к настройкам")}</button></div>`, "storage", "", "");
+        const form = this.dialog.querySelector("form");
+        try {
+            const info = await this.hass.callWS({ type: "medicine_cabinet/request", operation: "storage_info" });
+            if (this.dialog.querySelector("form") !== form || !this.dialog.open)
+                return;
+            this.storage = info;
+            form.querySelector(".storage-content").innerHTML = `<div class="storage-summary"><span>${this.t("Аптечек: ")}<b>${info.kits}</b></span><span>${this.t("Препаратов: ")}<b>${info.medicines}</b></span><span>${this.t("Упаковок: ")}<b>${info.packages}</b></span><span>${this.t("Фотографий: ")}<b>${info.photos} · ${this.fileSize(info.photo_bytes)}</b></span></div><section class="storage-section"><h3>${this.t("Резервная копия")}</h3><p>${this.t("ZIP со всеми аптечками, лекарствами, категориями, результатами ревизий и используемыми фотографиями. Настройки интеграции не включены. Инструкция по восстановлению находится внутри архива.")}</p>${info.missing_photos ? `<p class="notice">${this.t("Не найдено фотографий: ")}${info.missing_photos}. ${this.t("Загрузите их заново или уберите из записей перед созданием копии.")}</p>` : ""}<button type="button" data-action="storage-backup" ${info.missing_photos ? "disabled" : ""}>${icon("download")}${this.t("Скачать резервную копию ZIP")}</button></section><section class="storage-section"><h3>${this.t("Неиспользуемые фотографии")}</h3><p>${this.t("Удалятся только фото, которые не используются ни в одной упаковке. Загрузки за последние 24 часа сохраняются, чтобы не мешать открытым формам.")}</p><p class="small muted">${this.t("Можно очистить: ")}${info.unused} · ${this.fileSize(info.unused_bytes)}${info.recent_unused ? `<br>${this.t("Недавние загрузки, пока сохранены: ")}${info.recent_unused}` : ""}</p><button type="button" data-action="storage-cleanup-confirm" ${info.unused ? "" : "disabled"}>${this.t("Очистить неиспользуемые фото")}</button></section><section class="storage-section storage-danger"><h3>${this.t("Удаление данных")}</h3><p>${this.t("Удалятся все аптечки, лекарства, категории, результаты ревизий и фотографии. Интеграция, язык, название панели и настройки уведомлений останутся.")}</p><p class="small muted">${this.t("Скачанные файлы и резервные копии Home Assistant не удаляются.")}</p><button type="button" class="danger" data-action="storage-clear-confirm">${this.t("Удалить все данные аптечки")}</button></section>`;
+        }
+        catch (err) {
+            if (this.dialog.querySelector("form") !== form)
+                return;
+            form.querySelector(".storage-content").innerHTML = `<button type="button" data-action="storage">${this.t("Повторить")}</button>`;
+            this.showError(err, true);
+        }
+    }
+    storageConfirm(clear) {
+        if (!this.storage || !this.hass.user?.is_admin || this.storageBusy)
+            return;
+        const info = this.storage;
+        const confirmation = this.language === "en" ? "DELETE" : "УДАЛИТЬ";
+        const content = clear ? `<p class="explanation">${this.t("Будут удалены данные всех пользователей: ")}${info.kits} ${this.t("аптечек, ")}${info.packages} ${this.t("упаковок, ")}${info.categories} ${this.t("категорий и ")}${info.photos} ${this.t("фотографий.")}</p><p class="explanation">${this.t("Сначала скачайте резервную копию, если хотите сохранить данные.")}</p><label class="field">${this.t("Для подтверждения введите ")}<strong>${confirmation}</strong><input name="confirmation" autocomplete="off" spellcheck="false" required pattern="${confirmation}"></label>` : `<p class="explanation">${this.t("Будут удалены неиспользуемые фотографии: ")}${info.unused} · ${this.fileSize(info.unused_bytes)}. ${this.t("Фотографии существующих упаковок сохранятся.")}</p>`;
+        this.showDialog(this.t(clear ? "Удалить все данные аптечки?" : "Очистить неиспользуемые фото?"), content, clear ? "storage_clear" : "storage_cleanup", "", this.t(clear ? "Удалить все данные" : "Очистить"), "storage");
+        const form = this.dialog.querySelector("form");
+        form.dataset.revision = String(info.revision);
+        if (clear) {
+            const input = form.querySelector('[name="confirmation"]');
+            const submit = form.querySelector('[type="submit"]');
+            submit.disabled = true;
+            input.addEventListener("input", () => { submit.disabled = input.value !== confirmation || this.storageBusy; });
+        }
+    }
+    async storageBackup(button) {
+        if (this.storageBusy || !this.hass.user?.is_admin)
+            return;
+        this.storageBusy = true;
+        const form = button.closest("form");
+        const buttons = [...form.querySelectorAll("button")];
+        const previous = buttons.map(b => b.disabled);
+        buttons.forEach(b => { b.disabled = true; });
+        button.textContent = this.t("Создание копии…");
+        this.showError("", true);
+        try {
+            const response = await this.hass.fetchWithAuth("/api/medicine_cabinet/backup");
+            if (!response.ok)
+                throw await response.json();
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `hamb-backup-${this.data.today}.zip`;
+            document.body.append(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 60000);
+            this.toast(this.t("Резервная копия подготовлена для скачивания"));
+        }
+        catch (err) {
+            if (this.dialog.querySelector("form") === form)
+                this.showError(err, true);
+            else
+                this.showError(err);
+        }
+        finally {
+            this.storageBusy = false;
+            buttons.forEach((b, i) => { b.disabled = previous[i]; });
+            button.innerHTML = `${icon("download")}${this.t("Скачать резервную копию ZIP")}`;
+        }
+    }
+    async storageSubmit(form) {
+        if (this.storageBusy || !this.hass.user?.is_admin)
+            return;
+        this.storageBusy = true;
+        const buttons = [...form.querySelectorAll("button")];
+        buttons.forEach(b => { b.disabled = true; });
+        this.showError("", true);
+        const clear = form.dataset.kind === "storage_clear";
+        try {
+            const result = await this.hass.callWS({ type: "medicine_cabinet/request", operation: form.dataset.kind, revision: Number(form.dataset.revision), payload: clear ? { confirmation: "DELETE" } : {} });
+            if (clear) {
+                this.audit = undefined;
+                this.openGroups.clear();
+                this.compactOpenGroups.clear();
+                for (const url of this.imageUrls.values())
+                    URL.revokeObjectURL(url);
+                this.imageUrls.clear();
+            }
+            await this.refresh();
+            this.storageBusy = false;
+            await this.storageDialog();
+            if (result.failed)
+                this.showError(this.t("Часть файлов не удалось удалить. Проверьте права на папку фотографий и повторите очистку.") + ` (${result.failed})`, true);
+            else
+                this.toast(clear ? this.t("Все данные аптечки удалены") : `${this.t("Удалено файлов: ")}${result.removed} · ${this.fileSize(result.removed_bytes)}`);
+        }
+        catch (err) {
+            this.showError(err, true);
+            if (err.code === "conflict")
+                form.querySelector(".conflict-actions").innerHTML = `<button type="button" data-action="storage">${this.t("Обновить сведения о хранилище")}</button>`;
+        }
+        finally {
+            this.storageBusy = false;
+            buttons.forEach(b => { b.disabled = false; });
+        }
+    }
     settingsDialog() {
-        this.showDialog(this.t("Аптечки и настройки"), `<div class="actions"><button type="button" data-action="kit-add">${icon("plus")}${this.t("Новая аптечка")}</button>${this.kitId ? `<button type="button" data-action="kit-edit">${this.t("Переименовать")}</button><button type="button" class="danger" data-action="kit-delete">${this.t("Удалить аптечку")}</button>` : ""}</div>${this.viewSettingsHtml()}${this.auditSettingsHtml()}${this.categoryCatalogHtml()}<p class="explanation">${this.t("Напоминания отправляются отдельно для каждой упаковки за 90 и за 7 дней. Данные и фотографии хранятся на вашем сервере.")}</p>${this.hass.user?.is_admin ? `<a class="settings-link" href="/config/integrations/integration/medicine_cabinet">${this.t("Язык, название и уведомления →")}</a>` : `<p class="explanation">${this.t("Время и получателей уведомлений настраивает администратор HA.")}</p>`}`, "settings", "", "");
+        this.showDialog(this.t("Аптечки и настройки"), `<div class="actions"><button type="button" data-action="kit-add">${icon("plus")}${this.t("Новая аптечка")}</button>${this.kitId ? `<button type="button" data-action="kit-edit">${this.t("Переименовать")}</button><button type="button" class="danger" data-action="kit-delete">${this.t("Удалить аптечку")}</button>` : ""}</div>${this.viewSettingsHtml()}${this.auditSettingsHtml()}${this.hass.user?.is_admin ? `<section class="settings-section"><button type="button" data-action="storage">${this.t("Данные и хранилища")}</button></section>` : ""}${this.categoryCatalogHtml()}<p class="explanation">${this.t("Напоминания отправляются отдельно для каждой упаковки за 90 и за 7 дней. Данные и фотографии хранятся на вашем сервере.")}</p>${this.hass.user?.is_admin ? `<a class="settings-link" href="/config/integrations/integration/medicine_cabinet">${this.t("Язык, название и уведомления →")}</a>` : `<p class="explanation">${this.t("Время и получателей уведомлений настраивает администратор HA.")}</p>`}`, "settings", "", "");
         this.renderCategoryCatalog();
     }
     categoryCatalogHtml() {
@@ -1381,8 +1552,12 @@ class MedicineCabinetPanel extends HTMLElement {
         void this.submit(event.target);
     };
     async submit(form) {
-        if (form.dataset.kind === "settings" || this.creatingCategory || !form.reportValidity())
+        if (["settings", "storage", "audit_result"].includes(form.dataset.kind || "") || this.creatingCategory || !form.reportValidity())
             return;
+        if (form.dataset.kind === "storage_clear" || form.dataset.kind === "storage_cleanup") {
+            await this.storageSubmit(form);
+            return;
+        }
         const buttons = [...form.querySelectorAll("button")];
         buttons.forEach(b => { b.disabled = true; });
         this.showError("", true);

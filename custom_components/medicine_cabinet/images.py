@@ -56,4 +56,7 @@ def save_image(data: bytes, directory: Path) -> str:
         # Requests are serialised by the manager's image lock.
         temporary.write_bytes(content)
         temporary.replace(destination)
+    else:
+        # Reusing an unreferenced image starts a new grace period for the open form.
+        destination.touch()
     return image_id
