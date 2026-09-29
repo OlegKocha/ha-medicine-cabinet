@@ -320,7 +320,63 @@ async def test_clear_persists_empty_catalog_across_reload_and_allows_new_categor
     assert next(iter(result["categories"].values()))["name"] == "Единственная"
 
 
-@pytest.mark.parametrize("operation", ["category_save", "category_delete", "categories_clear"])
+async def test_restore_defaults_from_empty_catalog_is_durable_and_preserves_inventory():
+    data, _, item_id = inventory()
+    data["packages"][item_id]["image_id"] = "a" * 64
+    data = change(data, "categories_clear")
+    before = deepcopy(data)
+    store = MemoryStore()
+    store.data = deepcopy(data)
+    repo = Repository(store, lambda: NOW)
+    await repo.load()
+    await repo.change("categories_restore", {}, data["revision"])
+    expected = {
+        **before,
+        "categories": empty_inventory()["categories"],
+        "revision": before["revision"] + 1,
+    }
+    assert repo.data == store.data == expected
+    assert data == before
+    reloaded = Repository(store, lambda: NOW)
+    await reloaded.load()
+    assert reloaded.data == expected
+    await reloaded.change("categories_restore", {}, expected["revision"])
+    assert reloaded.data == {**expected, "revision": expected["revision"] + 1}
+
+
+@pytest.mark.parametrize("name", ["  дЕТСкАЯ   аптечка ", "  CHILDREN'S   MEDICINE BOX "])
+def test_restore_preserves_edited_defaults_and_reuses_custom_names_in_both_languages(name):
+    data, _, item_id = inventory()
+    data = change(
+        data,
+        "category_save",
+        id="default_allergy",
+        name="Своя аллергия",
+        color="#123456",
+        icon="mdi:cat",
+    )
+    data = change(data, "category_delete", id="default_children")
+    data = change(data, "category_delete", id="default_travel")
+    data = change(data, "category_save", name=name, color="#abcdef", icon="mdi:star")
+    custom_id = next(key for key in data["categories"] if not key.startswith("default_"))
+    data["packages"][item_id]["category_ids"] = [custom_id, "default_allergy"]
+    before = deepcopy(data)
+    result = change(data, "categories_restore")
+    assert result == {
+        **before,
+        "revision": before["revision"] + 1,
+        "categories": {
+            **before["categories"],
+            "default_travel": empty_inventory()["categories"]["default_travel"],
+        },
+    }
+    assert load_inventory(result) == result
+    assert data == before
+
+
+@pytest.mark.parametrize(
+    "operation", ["category_save", "category_delete", "categories_clear", "categories_restore"]
+)
 def test_stale_category_management_is_rejected(operation):
     original = empty_inventory()
     changed = change(original, "category_save", name="Другая", color="#112233", icon="mdi:cat")

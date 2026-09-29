@@ -80,11 +80,60 @@ test('full deletion requires typed confirmation, rejects stale data and stays em
  expect((await snapshot(page)).kits).toEqual({});expect((await snapshot(page)).categories).toEqual({});
 });
 
+test('restoring defaults from storage fills an empty catalog and is safe to repeat',async({page},testInfo)=>{
+ await change(page,'categories_clear',{});
+ const before=await snapshot(page);
+ await storage(page);
+ const restore=page.getByRole('button',{name:'Восстановить стандартные категории',exact:true});
+ await expect(restore).toBeVisible();await restore.click();
+ await expect(page.locator('.category-restore-result')).toHaveText('Восстановлено категорий: 21');
+ await expect(restore).toBeEnabled();
+ const restored=await snapshot(page);
+ expect(Object.keys(restored.categories)).toHaveLength(21);
+ for(const key of ['kits','groups','packages'])expect(restored[key]).toEqual(before[key]);
+ for(const item of Object.values(restored.packages).filter(p=>p.image_id))expect(fs.existsSync(`.ha-test/medicine_cabinet/images/${item.image_id}.jpg`)).toBe(true);
+ expect(await page.locator('dialog').evaluate(el=>el.scrollWidth<=el.clientWidth+1)).toBe(true);
+ await restore.scrollIntoViewIfNeeded();
+ await page.screenshot({path:`tmp/ui-restore-categories-${testInfo.project.name}.png`,fullPage:true});
+ await restore.click();await expect(page.locator('.category-restore-result')).toHaveText('Стандартные категории уже добавлены');
+ expect((await snapshot(page)).categories).toEqual(restored.categories);
+ await close(page);await page.reload();await page.waitForFunction(()=>window.testHass);
+ expect((await snapshot(page)).categories).toEqual(restored.categories);
+ await settings(page);await expect(page.locator('[data-action=storage-restore-categories]')).toHaveCount(0);
+ await expect(page.locator('.category-catalog-list .category-badge')).toHaveCount(21);
+});
+
+test('restoration rejects stale storage details and preserves edited and custom categories',async({page})=>{
+ await change(page,'categories_clear',{});
+ await change(page,'categories_restore',{});
+ await change(page,'category_delete',{id:'default_children'});
+ await change(page,'category_save',{name:'Детская аптечка',color:'#123456',icon:'mdi:star'});
+ await change(page,'category_save',{id:'default_allergy',name:'Своё название',color:'#abcdef',icon:'mdi:cat'});
+ await change(page,'category_delete',{id:'default_travel'});
+ await storage(page);
+ await change(page,'category_save',{name:'Новая категория',color:'#112233',icon:'mdi:bag-suitcase'});
+ const before=await snapshot(page);
+ const restore=page.getByRole('button',{name:'Восстановить стандартные категории',exact:true});
+ await restore.click();
+ await expect(page.getByRole('button',{name:'Обновить сведения о хранилище',exact:true})).toBeVisible();
+ expect((await snapshot(page)).categories).toEqual(before.categories);
+ await page.getByRole('button',{name:'Обновить сведения о хранилище',exact:true}).click();
+ await restore.click();await expect(page.locator('.category-restore-result')).toHaveText('Восстановлено категорий: 1');
+ const after=await snapshot(page);
+ for(const [key,value] of Object.entries(before.categories))expect(after.categories[key]).toEqual(value);
+ expect(after.categories.default_children).toBeUndefined();
+ expect(after.categories.default_travel.name).toBe('Дорожная аптечка');
+ expect(after.packages).toEqual(before.packages);
+});
+
 test('storage labels translate to English and controls are hidden for non-admin users',async({page})=>{
+ await change(page,'categories_restore',{});
  await page.evaluate(()=>{const call=window.testHass.callWS;window.testHass.callWS=async message=>{const data=await call(message);if(data?.settings)data.settings={...data.settings,language:'en',sidebar_title:'Medicine Box'};return data;};});
  await change(page,'kit_save',{name:'English trigger'});await expect(page.locator('header strong')).toHaveText('Medicine Box');
  await settings(page);await page.getByRole('button',{name:'Data and storage',exact:true}).click();
  await expect(page.getByRole('button',{name:'Download ZIP backup',exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Restore default categories',exact:true}).click();
+ await expect(page.locator('.category-restore-result')).toHaveText('Default categories are already present');
  await page.locator('[data-action=storage-clear-confirm]').click();
  await expect(page.locator('[name=confirmation]')).toHaveAttribute('pattern','DELETE');
  await close(page);

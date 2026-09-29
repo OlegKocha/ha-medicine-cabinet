@@ -91,7 +91,12 @@ async def test_admin_backup_authorization_and_clear_are_durable(runtime):
                     return await ws.receive_json()
 
                 if not admin:
-                    for operation in ("storage_info", "storage_cleanup", "storage_clear"):
+                    for operation in (
+                        "storage_info",
+                        "storage_cleanup",
+                        "storage_clear",
+                        "categories_restore",
+                    ):
                         result = await request(
                             operation, {"confirmation": "DELETE"}, original["revision"]
                         )
@@ -143,6 +148,47 @@ async def test_admin_backup_authorization_and_clear_are_durable(runtime):
     await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
     assert hass.data["medicine_cabinet"].repo.data == original
+
+
+async def test_restore_categories_requires_admin_and_revision_and_survives_reload(runtime):
+    hass, base, token = runtime
+    manager, image_id = await seed(hass)
+    await manager.async_change("categories_clear", {}, manager.repo.data["revision"])
+    before = deepcopy(manager.repo.data)
+    photo = (manager.media_dir / f"{image_id}.jpg").read_bytes()
+    async with aiohttp.ClientSession() as session:
+        async with session.ws_connect(base + "/api/websocket") as ws:
+            await ws.receive_json()
+            await ws.send_json({"type": "auth", "access_token": token})
+            assert (await ws.receive_json())["type"] == "auth_ok"
+            for sequence, revision in enumerate(
+                (None, before["revision"] - 1, before["revision"]), 1
+            ):
+                message = {
+                    "id": sequence,
+                    "type": "medicine_cabinet/request",
+                    "operation": "categories_restore",
+                }
+                if revision is not None:
+                    message["revision"] = revision
+                await ws.send_json(message)
+                response = await ws.receive_json()
+                if sequence < 3:
+                    assert response["error"]["code"] == "conflict"
+                    assert manager.repo.data == before
+                else:
+                    assert response["success"]
+                    assert len(response["result"]["categories"]) == 21
+    restored = deepcopy(manager.repo.data)
+    assert restored == {
+        **before,
+        "revision": before["revision"] + 1,
+        "categories": restored["categories"],
+    }
+    await hass.config_entries.async_reload(manager.entry.entry_id)
+    await hass.async_block_till_done()
+    assert hass.data["medicine_cabinet"].repo.data == restored
+    assert (manager.media_dir / f"{image_id}.jpg").read_bytes() == photo
 
 
 async def test_failed_store_write_does_not_remove_data_or_photos(runtime):

@@ -90,6 +90,8 @@ The selected answer is highlighted. You can change or clear an answer before sav
 
 Categories are shared by all medicine boxes. Add a category in advance, search the list, change its name, color or Home Assistant icon, or delete it. You can remove the default categories too, including all of them if you prefer to keep your inventory uncategorized.
 
+To bring back deleted defaults, open **Settings (gear) → Data and storage → Restore default categories**. This adds missing categories from the set of 21, preserves edited names, colors, icons and package assignments, and avoids duplicate categories. The number restored appears below the button.
+
 ### Language, reminders and storage
 
 Administrators can scroll through Settings to access:

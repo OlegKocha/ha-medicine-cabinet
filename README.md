@@ -87,6 +87,8 @@ For a manual transfer, keep the records file at `/config/.storage/medicine_cabin
 
 Administrators can open **Settings (gear) → Data and storage** to download a ZIP backup containing all cabinets, medicines, categories, stocktake results and referenced photos. Restore instructions are included in the archive. Integration settings are not included.
 
+The same dialog includes **Restore default categories**. It adds missing entries from the set of 21 without overwriting existing categories or medicine assignments. Reinstalling the integration does not automatically restore deleted categories.
+
 The same dialog can remove unused photos or delete all inventory data and photos while keeping the integration configured. Unused uploads less than 24 hours old are kept to protect open forms. Deleting all data requires confirmation and does not delete downloaded files or existing Home Assistant backups.
 
 Removing the integration from Devices & services preserves your data. You can access it again after adding HAMB back.

@@ -44,9 +44,14 @@ def manager_for(hass):
 async def websocket_request(hass, connection, msg):
     try:
         manager = manager_for(hass)
+        if msg["operation"] in (
+            "storage_info",
+            "storage_cleanup",
+            "storage_clear",
+            "categories_restore",
+        ) and (connection.user is None or not connection.user.is_admin):
+            raise InventoryError("unauthorized", "Доступно только администратору")
         if msg["operation"] in ("storage_info", "storage_cleanup", "storage_clear"):
-            if connection.user is None or not connection.user.is_admin:
-                raise InventoryError("unauthorized", "Доступно только администратору")
             if msg["operation"] == "storage_info":
                 result = await manager.async_storage_info()
             else:

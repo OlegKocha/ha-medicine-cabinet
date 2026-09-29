@@ -309,6 +309,19 @@ def mutate(data: dict, operation: str, payload: dict, revision: int, now: dateti
             k: v for k, v in result["packages"].items() if v["group_id"] not in group_ids
         }
         result["groups"] = {k: v for k, v in result["groups"].items() if k not in group_ids}
+    elif operation == "categories_restore":
+        # Preserve edited defaults and reuse equivalent user-created labels.
+        names = {
+            medicine_name_key(name)
+            for category in result["categories"].values()
+            for name in (category["name"], category.get("name_en", ""))
+            if name.strip()
+        }
+        for category_id, category in default_categories().items():
+            aliases = {medicine_name_key(category["name"]), medicine_name_key(category["name_en"])}
+            if category_id not in result["categories"] and names.isdisjoint(aliases):
+                result["categories"][category_id] = category
+                names.update(aliases)
     elif operation == "category_save":
         name = " ".join(
             text_field(payload.get("name"), "Название категории", 100, required=True).split()

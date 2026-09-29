@@ -15,6 +15,12 @@ const english = {
     "Не найдено фотографий: ": "Missing photos: ",
     "Загрузите их заново или уберите из записей перед созданием копии.": "Upload them again or remove them from the affected records before backing up.",
     "Скачать резервную копию ZIP": "Download ZIP backup",
+    "Стандартные категории": "Default categories",
+    "Восстановить стандартные категории": "Restore default categories",
+    "Добавит недостающие категории из стандартного набора (21 категория). Существующие названия, цвета, значки и категории лекарств сохранятся.": "Adds missing categories from the default set of 21. Existing names, colors, icons, and medicine category assignments are preserved.",
+    "Восстановление…": "Restoring…",
+    "Восстановлено категорий: ": "Categories restored: ",
+    "Стандартные категории уже добавлены": "Default categories are already present",
     "Неиспользуемые фотографии": "Unused photos",
     "Удалятся только фото, которые не используются ни в одной упаковке. Загрузки за последние 24 часа сохраняются, чтобы не мешать открытым формам.": "Only photos unused by any package will be deleted. Uploads from the last 24 hours are kept to protect forms still being edited.",
     "Можно очистить: ": "Ready to clean: ",
@@ -1245,6 +1251,8 @@ class MedicineCabinetPanel extends HTMLElement {
             void this.storageDialog();
         else if (action === "storage-backup")
             void this.storageBackup(button);
+        else if (action === "storage-restore-categories")
+            void this.restoreCategories(button);
         else if (action === "storage-cleanup-confirm")
             this.storageConfirm(false);
         else if (action === "storage-clear-confirm")
@@ -1356,7 +1364,7 @@ class MedicineCabinetPanel extends HTMLElement {
             if (this.dialog.querySelector("form") !== form || !this.dialog.open)
                 return;
             this.storage = info;
-            form.querySelector(".storage-content").innerHTML = `<div class="storage-summary"><span>${this.t("Аптечек: ")}<b>${info.kits}</b></span><span>${this.t("Препаратов: ")}<b>${info.medicines}</b></span><span>${this.t("Упаковок: ")}<b>${info.packages}</b></span><span>${this.t("Фотографий: ")}<b>${info.photos} · ${this.fileSize(info.photo_bytes)}</b></span></div><section class="storage-section"><h3>${this.t("Резервная копия")}</h3><p>${this.t("ZIP со всеми аптечками, лекарствами, категориями, результатами ревизий и используемыми фотографиями. Настройки интеграции не включены. Инструкция по восстановлению находится внутри архива.")}</p>${info.missing_photos ? `<p class="notice">${this.t("Не найдено фотографий: ")}${info.missing_photos}. ${this.t("Загрузите их заново или уберите из записей перед созданием копии.")}</p>` : ""}<button type="button" data-action="storage-backup" ${info.missing_photos ? "disabled" : ""}>${icon("download")}${this.t("Скачать резервную копию ZIP")}</button></section><section class="storage-section"><h3>${this.t("Неиспользуемые фотографии")}</h3><p>${this.t("Удалятся только фото, которые не используются ни в одной упаковке. Загрузки за последние 24 часа сохраняются, чтобы не мешать открытым формам.")}</p><p class="small muted">${this.t("Можно очистить: ")}${info.unused} · ${this.fileSize(info.unused_bytes)}${info.recent_unused ? `<br>${this.t("Недавние загрузки, пока сохранены: ")}${info.recent_unused}` : ""}</p><button type="button" data-action="storage-cleanup-confirm" ${info.unused ? "" : "disabled"}>${this.t("Очистить неиспользуемые фото")}</button></section><section class="storage-section storage-danger"><h3>${this.t("Удаление данных")}</h3><p>${this.t("Удалятся все аптечки, лекарства, категории, результаты ревизий и фотографии. Интеграция, язык, название панели и настройки уведомлений останутся.")}</p><p class="small muted">${this.t("Скачанные файлы и резервные копии Home Assistant не удаляются.")}</p><button type="button" class="danger" data-action="storage-clear-confirm">${this.t("Удалить все данные аптечки")}</button></section>`;
+            form.querySelector(".storage-content").innerHTML = `<div class="storage-summary"><span>${this.t("Аптечек: ")}<b>${info.kits}</b></span><span>${this.t("Препаратов: ")}<b>${info.medicines}</b></span><span>${this.t("Упаковок: ")}<b>${info.packages}</b></span><span>${this.t("Фотографий: ")}<b>${info.photos} · ${this.fileSize(info.photo_bytes)}</b></span></div><section class="storage-section"><h3>${this.t("Резервная копия")}</h3><p>${this.t("ZIP со всеми аптечками, лекарствами, категориями, результатами ревизий и используемыми фотографиями. Настройки интеграции не включены. Инструкция по восстановлению находится внутри архива.")}</p>${info.missing_photos ? `<p class="notice">${this.t("Не найдено фотографий: ")}${info.missing_photos}. ${this.t("Загрузите их заново или уберите из записей перед созданием копии.")}</p>` : ""}<button type="button" data-action="storage-backup" ${info.missing_photos ? "disabled" : ""}>${icon("download")}${this.t("Скачать резервную копию ZIP")}</button></section><section class="storage-section"><h3>${this.t("Стандартные категории")}</h3><p>${this.t("Добавит недостающие категории из стандартного набора (21 категория). Существующие названия, цвета, значки и категории лекарств сохранятся.")}</p><button type="button" data-action="storage-restore-categories">${this.t("Восстановить стандартные категории")}</button><p class="category-restore-result" role="status" hidden></p></section><section class="storage-section"><h3>${this.t("Неиспользуемые фотографии")}</h3><p>${this.t("Удалятся только фото, которые не используются ни в одной упаковке. Загрузки за последние 24 часа сохраняются, чтобы не мешать открытым формам.")}</p><p class="small muted">${this.t("Можно очистить: ")}${info.unused} · ${this.fileSize(info.unused_bytes)}${info.recent_unused ? `<br>${this.t("Недавние загрузки, пока сохранены: ")}${info.recent_unused}` : ""}</p><button type="button" data-action="storage-cleanup-confirm" ${info.unused ? "" : "disabled"}>${this.t("Очистить неиспользуемые фото")}</button></section><section class="storage-section storage-danger"><h3>${this.t("Удаление данных")}</h3><p>${this.t("Удалятся все аптечки, лекарства, категории, результаты ревизий и фотографии. Интеграция, язык, название панели и настройки уведомлений останутся.")}</p><p class="small muted">${this.t("Скачанные файлы и резервные копии Home Assistant не удаляются.")}</p><button type="button" class="danger" data-action="storage-clear-confirm">${this.t("Удалить все данные аптечки")}</button></section>`;
         }
         catch (err) {
             if (this.dialog.querySelector("form") !== form)
@@ -1379,6 +1387,50 @@ class MedicineCabinetPanel extends HTMLElement {
             const submit = form.querySelector('[type="submit"]');
             submit.disabled = true;
             input.addEventListener("input", () => { submit.disabled = input.value !== confirmation || this.storageBusy; });
+        }
+    }
+    async restoreCategories(button) {
+        if (!this.storage || this.storageBusy || !this.hass.user?.is_admin)
+            return;
+        const info = this.storage;
+        this.storageBusy = true;
+        const form = button.closest("form");
+        const buttons = [...form.querySelectorAll("button")];
+        const previous = buttons.map(b => b.disabled);
+        buttons.forEach(b => { b.disabled = true; });
+        button.textContent = this.t("Восстановление…");
+        this.showError("", true);
+        form.querySelector(".conflict-actions").innerHTML = "";
+        try {
+            const result = await this.hass.callWS({ type: "medicine_cabinet/request", operation: "categories_restore", revision: info.revision, payload: {} });
+            const restored = Object.keys(result.categories).length - info.categories;
+            await this.refresh();
+            this.storageBusy = false;
+            if (this.dialog.querySelector("form") === form && this.dialog.open)
+                await this.storageDialog();
+            const message = restored ? `${this.t("Восстановлено категорий: ")}${restored}` : this.t("Стандартные категории уже добавлены");
+            const notice = this.dialog.open ? this.dialog.querySelector(".category-restore-result") : null;
+            if (notice) {
+                notice.textContent = message;
+                notice.hidden = false;
+                notice.scrollIntoView({ block: "nearest" });
+            }
+            else
+                this.toast(message);
+        }
+        catch (err) {
+            if (this.dialog.querySelector("form") === form && this.dialog.open) {
+                this.showError(err, true);
+                if (err.code === "conflict")
+                    form.querySelector(".conflict-actions").innerHTML = `<button type="button" data-action="storage">${this.t("Обновить сведения о хранилище")}</button>`;
+            }
+            else
+                this.showError(err);
+        }
+        finally {
+            this.storageBusy = false;
+            buttons.forEach((b, i) => { b.disabled = previous[i]; });
+            button.textContent = this.t("Восстановить стандартные категории");
         }
     }
     async storageBackup(button) {
