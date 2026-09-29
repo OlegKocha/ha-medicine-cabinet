@@ -29,6 +29,12 @@
 - **Two languages.** The interface, notifications and exports are available in English and Russian. You can also choose your own sidebar title.
 - **Local storage.** Records and photos stay on your Home Assistant server.
 
+## Examples
+
+Explore the medicine list, compact view, adding medicines, settings, stocktake, exports and notifications in the [illustrated guides](examples/README.md).
+
+[English screenshots and walkthrough](examples/en/examples.md) · [Примеры на русском](examples/ru/examples.md)
+
 ## Installation
 
 ### With HACS
